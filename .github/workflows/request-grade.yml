@@ -1,0 +1,28 @@
+name: Request Project Grade
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        description: 'Project release to grade'
+        required: true
+        default: 'v1.0.0'
+
+      type:
+        description: 'Type of grade, [f]unctionality or [d]esign'
+        required: true
+        default: 'functionality'
+
+jobs:
+  grade:
+    name: 'Request Project Grade'
+    runs-on: ubuntu-20.04
+    timeout-minutes: 3
+
+    steps:
+      - name: 'Request Project Grade'
+        uses: usf-cs272-fall2021/action-request-grade@main
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          release: ${{ github.event.inputs.release }}
+          type: ${{ github.event.inputs.type }}
