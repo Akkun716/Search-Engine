@@ -1,6 +1,7 @@
+import java.io.IOException;
+import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Arrays;
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -20,10 +21,28 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		// store initial start time
+		InvertedIndex invertInd = new InvertedIndex();
 		Instant start = Instant.now();
 
-		// TODO Fill in and modify as needed
-		System.out.println(Arrays.toString(args));
+		ArgumentMap argMap = new ArgumentMap(args);
+		
+		try {
+			if(argMap.hasFlag("-text")) {
+				invertInd.readFiles(argMap.getPath("-text"));
+			}
+			if(argMap.hasFlag("-index")) {
+				if(argMap.hasValue("-index")) {
+					invertInd.writeFile(Path.of(System.getProperty("user.dir"), argMap.getString("-index")));
+				}
+				else {
+					invertInd.writeFile(Path.of(System.getProperty("user.dir"), "index.json"));
+				}
+			}
+		} catch(IOException e) {
+			System.out.println("[The file could not be found]");
+		} catch(Exception e) {
+			System.out.println("Something is wrong...");
+		}
 
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
