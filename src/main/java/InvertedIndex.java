@@ -10,7 +10,7 @@ import java.util.TreeMap;
 
 /**
  * This class holds word stems and all of the files and positions within those 
- * files they have been found in. 
+ * files they have been found in.
  * 
  * @author Adon Anglon
  */
