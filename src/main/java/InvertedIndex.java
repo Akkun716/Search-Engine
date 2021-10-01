@@ -9,9 +9,10 @@ import java.util.Map;
 import java.util.TreeMap;
 
 /**
+ * This class holds word stems and all of the files and positions within those 
+ * files they have been found in.
  * 
- * @author aanglon
- * 
+ * @author Adon Anglon
  */
 public class InvertedIndex {
 	/**
@@ -27,6 +28,7 @@ public class InvertedIndex {
 	 * by the Path and adds them to the invertedIndex HashMap.
 	 * 
 	 * @param mainPath path that points to file/dir to be processed
+	 * @throws IOException file is invalid or can not be found
 	 */
 	public void readFiles(Path mainPath) throws IOException{
 		if(Files.isDirectory(mainPath)) {
@@ -79,7 +81,7 @@ public class InvertedIndex {
 	/**
 	 * Returns an unmodifiable invertedIndex for easy printing.
 	 * 
-	 * @return
+	 * @return an unmodifiable map that can be easily viewed for quick printing
 	 */
 	
 	public Map<String, Map<String, ArrayList<Integer>>> getMap() {
@@ -91,7 +93,7 @@ public class InvertedIndex {
 	 * to output file.
 	 * 
 	 * @param output path to the output file
-	 * @throws IOException
+	 * @throws IOException file is invalid or can not be found 
 	 */
 	public void writeFile(Path output) throws IOException {
 			JsonWriter.asNestedObject(invertedIndex, output);
