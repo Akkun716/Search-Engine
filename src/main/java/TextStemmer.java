@@ -176,26 +176,4 @@ public class TextStemmer {
 		}
 		return output;
 	}
-
-	/**
-	 * Demonstrates this class.
-	 *
-	 * @param args unused
-	 * @throws IOException if an I/O error occurs
-	 */
-	public static void main(String[] args) throws IOException {
-		String text = """
-				practic practical practice practiced practicer practices
-				practicing practis practisants practise practised practiser
-				practisers practises practising practitioner practitioners
-				""";
-
-		System.out.println(listStems(text));
-		System.out.println(uniqueStems(text));
-
-		Path base = Path.of("src", "test", "resources", "input.txt");
-		System.out.println(listStems(base));
-		System.out.println(uniqueStems(base));
-		System.out.println(listUniqueStems(base));
-	}
 }
