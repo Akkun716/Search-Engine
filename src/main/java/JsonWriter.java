@@ -10,6 +10,8 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
 
+// TODO See Piazza on Json writing
+
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
  * are used to separate elements and nested elements are indented using tabs.
@@ -47,10 +49,10 @@ public class JsonWriter {
 		}
 		edgeFormat(writer, level, "[]", true);
 	}
-	
+
 	/**
 	 * Writes the starting or ending specified brackets
-	 * 
+	 *
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @param edgeChars the brackets needed for formatting
@@ -61,7 +63,7 @@ public class JsonWriter {
 		if(end) {
 			writer.write("\n");
 		}
-		
+
 		levelAdjust(writer, level, true);
 		if(!end) {
 			writer.write(edgeChars.charAt(0));
@@ -69,14 +71,14 @@ public class JsonWriter {
 		else {
 			writer.write(edgeChars.charAt(1));
 		}
-		
+
 	}
-	
-	
-	
-	/** 
+
+
+
+	/**
 	 * Inserts necessary amount of indents as indicated by level
-	 * 
+	 *
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @param offset determines if line needs to be one indent level less than indicated
@@ -117,10 +119,10 @@ public class JsonWriter {
 		}
 		edgeFormat(writer, level, "{}", true);
 	}
-	
+
 	/**
 	 * Constructs JSON object key formatting by placing quotes ("") around key and colon (:) after
-	 * 
+	 *
 	 * @param writer the writer to use
 	 * @param key the Map key for JSON key formatting
 	 * @throws IOException if an IO error occurs
@@ -160,7 +162,7 @@ public class JsonWriter {
 		}
 		edgeFormat(writer, level, "{}", true);
 	}
-	
+
 	/**
 	 * Writes the elements as a pretty JSON object with nested objects with nested arrays.
 	 * The generic notation used allows this method to be used for any type of map with any
@@ -190,7 +192,7 @@ public class JsonWriter {
 		}
 		edgeFormat(writer, level, "{}", true);
 	}
-	
+
 
 	/**
 	 * Writes the elements as a pretty JSON array to file.
@@ -236,7 +238,7 @@ public class JsonWriter {
 			asNestedArray(elements, writer, 0);
 		}
 	}
-	
+
 	/**
 	 * Writes the elements as a pretty JSON object with nested objects to file.
 	 *
@@ -308,7 +310,7 @@ public class JsonWriter {
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Returns the elements as a pretty JSON object with nested objects.
 	 *
