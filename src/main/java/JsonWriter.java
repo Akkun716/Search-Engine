@@ -5,12 +5,8 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
-import java.util.TreeMap;
-
-// TODO See Piazza on Json writing
 
 /**
  * Outputs several simple data structures in "pretty" JSON format where newlines
@@ -32,21 +28,24 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asArray(Collection<Integer> elements, Writer writer, int level) throws IOException {
-		boolean first = true;
 		level++;
 		edgeFormat(writer, 0, "[]", false);
-		for(Integer elem: elements) {
-			//Handles comma after each element
-			if(!first) {
-				writer.write(",");
-			}
-			else {
-				first = false;
-			}
+
+		var iterator = elements.iterator();
+		if(iterator.hasNext()) {
+			var elem = iterator.next();
 			writer.write('\n');
 			levelAdjust(writer, level, false);
 			writer.write(elem.toString());
+			
+			while(iterator.hasNext()) {
+				elem = iterator.next();
+				writer.write(",\n");
+				levelAdjust(writer, level, false);
+				writer.write(elem.toString());
+			}
 		}
+		
 		edgeFormat(writer, level, "[]", true);
 	}
 
@@ -71,7 +70,6 @@ public class JsonWriter {
 		else {
 			writer.write(edgeChars.charAt(1));
 		}
-
 	}
 
 
@@ -85,6 +83,7 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	private static void levelAdjust(Writer writer, int level, boolean offset) throws IOException {
+		//Backs indent level by one
 		if(offset) {
 			level -= 1;
 		}
@@ -102,21 +101,25 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asObject(Map<String, Integer> elements, Writer writer, int level) throws IOException {
-		boolean first = true;
 		edgeFormat(writer, level++, "{}", false);
-		for(var elem: elements.entrySet()) {
-			//Handles comma after each element
-			if(!first) {
-				writer.write(",");
-			}
-			else {
-				first = false;
-			}
+
+		var iterator = elements.entrySet().iterator();
+		if(iterator.hasNext()) {
+			var elem = iterator.next();
 			writer.write('\n');
 			levelAdjust(writer, level, false);
 			keyFormat(writer, elem.getKey().toString());
 			writer.write(elem.getValue().toString());
+			
+			while(iterator.hasNext()) {
+				elem = iterator.next();
+				writer.write(",\n");
+				levelAdjust(writer, level, false);
+				keyFormat(writer, elem.getKey().toString());
+				writer.write(elem.getValue().toString());
+			}
 		}
+		
 		edgeFormat(writer, level, "{}", true);
 	}
 
@@ -145,21 +148,25 @@ public class JsonWriter {
 	 */
 	public static void asNestedArray(Map<String, ? extends Collection<Integer>> elements, Writer writer, int level)
 			throws IOException {
-		boolean first = true;
 		edgeFormat(writer, level++, "{}", false);
-		for(var elem: elements.entrySet()) {
-			//Handles comma after each element
-			if(!first) {
-				writer.write(",");
-			}
-			else {
-				first = false;
-			}
+		
+		var iterator = elements.entrySet().iterator();
+		if(iterator.hasNext()) {
+			var elem = iterator.next();
 			writer.write('\n');
 			levelAdjust(writer, level, false);
 			keyFormat(writer, elem.getKey().toString());
 			asArray(elem.getValue(), writer, level);
+			
+			while(iterator.hasNext()) {
+				elem = iterator.next();
+				writer.write(",\n");
+				levelAdjust(writer, level, false);
+				keyFormat(writer, elem.getKey().toString());
+				asArray(elem.getValue(), writer, level);
+			}
 		}
+		
 		edgeFormat(writer, level, "{}", true);
 	}
 
@@ -173,23 +180,27 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 */
-	public static void asNestedObject(Map<String, TreeMap<String, ArrayList<Integer>>> elements,
+	public static void asNestedObject(Map<String, ? extends Map<String, ? extends Collection<Integer>>> elements,
 			Writer writer, int level) throws IOException {
-		boolean first = true;
 		edgeFormat(writer, level++, "{}", false);
-		for(var elem: elements.entrySet()) {
-			//Handles comma after each element
-			if(!first) {
-				writer.write(",");
-			}
-			else {
-				first = false;
-			}
+
+		var iterator = elements.entrySet().iterator();
+		if(iterator.hasNext()) {
+			var elem = iterator.next();
 			writer.write('\n');
 			levelAdjust(writer, level, false);
 			keyFormat(writer, elem.getKey().toString());
 			asNestedArray(elem.getValue(), writer, level);
+			
+			while(iterator.hasNext()) {
+				elem = iterator.next();
+				writer.write(",\n");
+				levelAdjust(writer, level, false);
+				keyFormat(writer, elem.getKey().toString());
+				asNestedArray(elem.getValue(), writer, level);
+			}
 		}
+		
 		edgeFormat(writer, level, "{}", true);
 	}
 
@@ -248,7 +259,7 @@ public class JsonWriter {
 	 *
 	 * @see #asNestedArray(Map, Writer, int)
 	 */
-	public static void asNestedObject(Map<String, TreeMap<String, ArrayList<Integer>>> elements, Path path) throws IOException {
+	public static void asNestedObject(Map<String, ? extends Map<String, ? extends Collection<Integer>>> elements, Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asNestedObject(elements, writer, 0);
 		}
@@ -319,7 +330,7 @@ public class JsonWriter {
 	 *
 	 * @see #asNestedArray(Map, Writer, int)
 	 */
-	public static String asNestedObect(Map<String, TreeMap<String, ArrayList<Integer>>> elements) {
+	public static String asNestedObect(Map<String, ? extends Map<String, ? extends Collection<Integer>>> elements) {
 		try {
 			StringWriter writer = new StringWriter();
 			asNestedObject(elements, writer, 0);
