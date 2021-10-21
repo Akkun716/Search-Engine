@@ -1,10 +1,10 @@
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -73,21 +73,11 @@ public class TextStemmer {
 	 * @see TextParser#parse(String)
 	 */
 	public static List<String> listStems(Path input) throws IOException {
-		List<String> output = new ArrayList<>();
-		try(BufferedReader br = Files.newBufferedReader(input, StandardCharsets.UTF_8)) {
-			String line;
-			while((line = br.readLine()) != null) {
-				output.addAll(listStems(line));
-			}
-		} catch(IOException e) {
-			throw new IOException();
+		List<String> temp, output = new ArrayList<>();
+		for(String line: Files.readAllLines(input)) {
+			temp = listStems(line);
+			Collections.addAll(output, temp.toArray(new String[temp.size()]));
 		}
-//		for(String line: Files.readAllLines(input)) {
-//			temp = listStems(line);
-//			Collections.addAll(output, temp.toArray(new String[temp.size()]));
-//		}
-//		System.out.println(output);
-//		Lets see how this goes
 		return output;
 	}
 
@@ -138,13 +128,8 @@ public class TextStemmer {
 	 */
 	public static Set<String> uniqueStems(Path input) throws IOException {
 		Set<String> output = new TreeSet<>();
-		try(BufferedReader br = Files.newBufferedReader(input)) {
-			String line;
-			while((line = br.readLine()) != null) {
-				output.addAll(uniqueStems(line));
-			}
-		} catch(IOException e) {
-			throw new IOException();
+		for(String line: Files.readAllLines(input)) {
+			output.addAll(uniqueStems(line));
 		}
 		return output;
 	}
@@ -165,14 +150,8 @@ public class TextStemmer {
 	 */
 	public static List<Set<String>> listUniqueStems(Path input) throws IOException {
 		ArrayList<Set<String>> output = new ArrayList<Set<String>>();
-		
-		try(BufferedReader br = Files.newBufferedReader(input)) {
-			String line;
-			while((line = br.readLine()) != null) {
-				output.add(uniqueStems(line));
-			}
-		} catch(IOException e) {
-			throw new IOException();
+		for(String line: Files.readAllLines(input)) {
+			output.add(uniqueStems(line));
 		}
 		return output;
 	}
