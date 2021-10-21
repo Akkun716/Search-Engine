@@ -12,10 +12,6 @@ import java.time.Instant;
  * @version Fall 2021
  */
 public class Driver {
-	// TODO Slight improvement to exception handling
-	// TODO Variable names
-	// TODO Some shift of classes and methods
-
 	/**
 	 * Initializes the classes necessary based on the provided command-line
 	 * arguments. This includes (but is not limited to) how to build or search an
@@ -25,51 +21,32 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		// store initial start time
-		InvertedIndex invertInd = new InvertedIndex(); // TODO index
+		InvertedIndex index = new InvertedIndex();
 		Instant start = Instant.now();
 
-		ArgumentMap argMap = new ArgumentMap(args); // TODO map
+		ArgumentMap map = new ArgumentMap(args);
 
-		try {
-			if(argMap.hasFlag("-text")) {
-				invertInd.readFiles(argMap.getPath("-text"));
-			}
-			if(argMap.hasFlag("-index")) {
-				if(argMap.hasValue("-index")) {
-					invertInd.writeFile(Path.of(System.getProperty("user.dir"), argMap.getString("-index")));
-				}
-				else {
-					invertInd.writeFile(Path.of(System.getProperty("user.dir"), "index.json"));
-				}
-			}
-		} catch(IOException e) {
-			System.out.println("[The file could not be found]");
-		} catch(Exception e) {
-			System.out.println("Something is wrong...");
-		}
-
-		/* TODO
-		if(argMap.hasFlag("-text")) {
-			Path input = argMap.getPath("-text");
+		if(map.hasFlag("-text")) {
+			Path input = map.getPath("-text");
 			try {
-				invertInd.readFiles();
+				index.readFiles(map.getPath("-text"));
 			}
-			catch (...) {
-				Unable to build the inverted index from path: + input.toString();
+			catch(Exception e) {
+				System.out.println("Unable to build the inverted index from path: " + input.toString());
 			}
 		}
-
-		if(argMap.hasFlag("-index")) {
-			Path output = argMap.getPath("-index", Path.of("index.json"));
-
+		
+		if(map.hasFlag("-index")) {
+			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
-				invertInd.writeFile(output);
+				if(map.hasValue("-index")) {
+					index.writeFile(output);
+				}
 			}
-			catch ( ) {
-				etc
+			catch(Exception e) {
+				System.out.println("Unable to write out to file: " + output.toString());
 			}
 		}
-		*/
 
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
