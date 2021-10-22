@@ -31,16 +31,19 @@ public class Driver {
 				index.readFiles(map.getPath("-text"));
 			}
 			catch(Exception e) {
-				System.out.println("Unable to build the inverted index from path: " + input.toString());
+				if(input == null) {
+					System.out.println("Unable to build the inverted index from unreadable path");
+				}
+				else {
+					System.out.println("Unable to build the inverted index from path: " + input.toString());
+				}
 			}
 		}
 		
 		if(map.hasFlag("-index")) {
 			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
-				if(map.hasValue("-index")) {
-					index.writeFile(output);
-				}
+				index.writeFile(output);
 			}
 			catch(Exception e) {
 				System.out.println("Unable to write out to file: " + output.toString());
