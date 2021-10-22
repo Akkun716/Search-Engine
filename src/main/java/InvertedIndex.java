@@ -21,7 +21,7 @@ public class InvertedIndex {
 
 	/**
 	 * Takes in a Path object and uses TextStemmer to parse through the text file(s) indicated
-	 * by the Path and adds them to the invertedIndex HashMap.
+	 * by the Path and adds them to the invertedIndex HashMap. 
 	 *
 	 * @param mainPath path that points to file/dir to be processed
 	 * @throws IOException file is invalid or can not be found
