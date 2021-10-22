@@ -21,9 +21,9 @@ public class InvertedIndexBuilder {
 	 * @return true if the new key value pair did not exist and was added to map
 	 */
 	public boolean add(String word, String location, Integer position) {
-		return invertedIndex.putIfAbsent(word, new TreeMap<>())
-				.putIfAbsent(location, new TreeSet<Integer>())
-				.add(position);
+		invertedIndex.putIfAbsent(word, new TreeMap<>());
+		invertedIndex.get(word).putIfAbsent(location, new TreeSet<Integer>());
+		return invertedIndex.get(word).get(location).add(position);
 	}
 	
 	/**
