@@ -8,6 +8,12 @@ import java.util.TreeSet;
  * This class represents the data structure of the inverted index.
  */
 public class InvertedIndexBuilder {
+	/**
+	 * This map hold the data of the inverted index. The over-arching map holds
+	 * word stem keys which are paired to respective maps that has file location
+	 * keys which are then paired to an array of positions in the file the word
+	 * stem appeared  
+	 */
 	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex =
 			new TreeMap<>();
 
@@ -119,6 +125,7 @@ public class InvertedIndexBuilder {
 	 * keys in index
 	 * 
 	 * @param stem word stem key to be accessed
+	 * @param location file location to be found under word stem key
 	 * @return size of set assigned to location of word stem if exists; else 0
 	 */
 	public int positionCount(String stem, String location) {
