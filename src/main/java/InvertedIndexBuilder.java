@@ -4,6 +4,9 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+/**
+ * This class represents the data structure of the inverted index.
+ */
 public class InvertedIndexBuilder {
 	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex =
 			new TreeMap<>();
@@ -15,6 +18,7 @@ public class InvertedIndexBuilder {
 	 * @param word stemmed word
 	 * @param location file location where the word stem appeared
 	 * @param position position of the word stem in respective file location
+	 * @return true if the new key value pair did not exist and was added to map
 	 */
 	public boolean add(String word, String location, Integer position) {
 		return invertedIndex.putIfAbsent(word, new TreeMap<>())
@@ -58,6 +62,7 @@ public class InvertedIndexBuilder {
 	 * Checks if word stem exists as a key in index
 	 * 
 	 * @param stem word stem to be found in index
+	 * @return true if word stem exists as key in map
 	 */
 	public boolean hasStem(String stem) {
 		return invertedIndex.containsKey(stem);
@@ -68,6 +73,7 @@ public class InvertedIndexBuilder {
 	 *  
 	 * @param stem word stem to be found in index
 	 * @param location file location to be found under word stem key
+	 * @return true if location exists under word stem key
 	 */
 	public boolean hasLocation(String stem, String location) {
 		return hasStem(stem) && invertedIndex.get(stem).containsKey(location);
@@ -80,6 +86,7 @@ public class InvertedIndexBuilder {
 	 * @param stem word stem to be found in index
 	 * @param location file location to be found under word stem key
 	 * @param position position of the word stem at designated file location
+	 * @return true if position exists under word stem and designated file location
 	 */
 	public boolean hasPosition(String stem, String location, Integer position) {
 		return hasLocation(stem, location)
@@ -88,6 +95,8 @@ public class InvertedIndexBuilder {
 	
 	/**
 	 * Returns number of word stem keys in index
+	 * 
+	 * @return size of invertedIndex map
 	 */
 	public int stemCount() {
 		return invertedIndex.size();
@@ -97,6 +106,7 @@ public class InvertedIndexBuilder {
 	 * Returns number of file locations under word stem key in index
 	 * 
 	 * @param stem word stem key to be accessed
+	 * @return size of map assigned to word stem if exists; else 0
 	 */
 	public int locationCount(String stem) {
 		return hasStem(stem)
@@ -109,6 +119,7 @@ public class InvertedIndexBuilder {
 	 * keys in index
 	 * 
 	 * @param stem word stem key to be accessed
+	 * @return size of set assigned to location of word stem if exists; else 0
 	 */
 	public int positionCount(String stem, String location) {
 		return hasLocation(stem, location)
