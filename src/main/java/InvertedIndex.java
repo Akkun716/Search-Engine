@@ -5,12 +5,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 /**
- * TODO:
- * Move the string/file/directory parsing logic into an builder or factory
- * class (InvertedIndexBuidler)
- */
-
-/**
  * This class holds word stems and all of the files and positions within those
  * files they have been found in.
  *
@@ -22,7 +16,6 @@ public class InvertedIndex {
 	 * will hold file locations as keys and arrayList of Integers as values. These
 	 * Integers represent the position of the stemmed word occurrences
 	 */
-	// TODO Create a constructor and initialize it there
 	
 	public final InvertedIndexBuilder invertedIndex = new InvertedIndexBuilder();
 
