@@ -4,6 +4,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+/*
+ * TODO Refactor this one to InvertedIndexBuilder
+ */
+
 /**
  * This class holds word stems and all of the files and positions within those
  * files they have been found in.
@@ -11,17 +15,17 @@ import java.util.List;
  * @author Adon Anglon
  */
 public class InvertedIndex {
+	// TODO Make private, set the index in a constructor instead
 	/**
 	 * This map will hold stemmed words as keys and a treeMap as values. Those treeMaps
 	 * will hold file locations as keys and arrayList of Integers as values. These
 	 * Integers represent the position of the stemmed word occurrences
 	 */
-	
 	public final InvertedIndexBuilder invertedIndex = new InvertedIndexBuilder();
 
 	/**
 	 * Takes in a Path object and uses TextStemmer to parse through the text file(s) indicated
-	 * by the Path and adds them to the invertedIndex HashMap. 
+	 * by the Path and adds them to the invertedIndex HashMap.
 	 *
 	 * @param mainPath path that points to file/dir to be processed
 	 * @throws IOException file is invalid or can not be found
@@ -45,6 +49,26 @@ public class InvertedIndex {
 		}
 	}
 
+	/* TODO
+	public static boolean isTextFile(Path path) {
+		move the endsWith check here and then use this method instead
+	}
+	*/
+
+	/* TODO
+	public void readFile(Path path) throws IOException {
+		readFile(path, this.invertedIndex);
+	}
+
+	public static void readFile(Path path, InvertedIndexBuilder invertedIndex) {
+		int i = 1;
+		for(String stem: TextStemmer.listStems(path)) {
+			invertedIndex.add(stem, path.toString(), i++);
+		}
+	}
+	*/
+
+	// TODO Remove this one
 	/**
 	 * Parses through input word stem list and places occurrences into invertedIndex.
 	 * If word stem does not exist in index or file location does not exist in word stem
@@ -60,6 +84,7 @@ public class InvertedIndex {
 		}
 	}
 
+	// TODO Remove from here
 	/**
 	 * Utilizes the JsonWriter class and writes out invertedIndex in JSON format out
 	 * to output file.

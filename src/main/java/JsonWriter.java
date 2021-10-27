@@ -29,25 +29,37 @@ public class JsonWriter {
 	 */
 	public static void asArray(Collection<Integer> elements, Writer writer, int level) throws IOException {
 		level++;
-		edgeFormat(writer, 0, "[]", false);
+		edgeFormat(writer, 0, "[]", false); // TODO directly output [
 
 		var iterator = elements.iterator();
 		if(iterator.hasNext()) {
+			// TODO writeEntry
 			var elem = iterator.next();
 			writer.write('\n');
-			levelAdjust(writer, level, false);
+			levelAdjust(writer, level, false); // TODO use the level directly
 			writer.write(elem.toString());
-			
+
 			while(iterator.hasNext()) {
+				// TODO output comma, then writeEntry
 				elem = iterator.next();
 				writer.write(",\n");
-				levelAdjust(writer, level, false);
+				levelAdjust(writer, level, false);  // TODO use the level directly
 				writer.write(elem.toString());
 			}
 		}
-		
-		edgeFormat(writer, level, "[]", true);
+
+		// TODO reduce the level by 1
+		edgeFormat(writer, level, "[]", true); // TODO directly output ]
 	}
+
+	/* TODO
+	public static void writeEntry( ) {
+		elem = iterator.next();
+		writer.write("\n");
+		levelAdjust(writer, level, false);
+		writer.write(elem.toString());
+	}
+	*/
 
 	/**
 	 * Writes the starting or ending specified brackets
@@ -110,7 +122,7 @@ public class JsonWriter {
 			levelAdjust(writer, level, false);
 			keyFormat(writer, elem.getKey().toString());
 			writer.write(elem.getValue().toString());
-			
+
 			while(iterator.hasNext()) {
 				elem = iterator.next();
 				writer.write(",\n");
@@ -119,7 +131,7 @@ public class JsonWriter {
 				writer.write(elem.getValue().toString());
 			}
 		}
-		
+
 		edgeFormat(writer, level, "{}", true);
 	}
 
@@ -149,7 +161,7 @@ public class JsonWriter {
 	public static void asNestedArray(Map<String, ? extends Collection<Integer>> elements, Writer writer, int level)
 			throws IOException {
 		edgeFormat(writer, level++, "{}", false);
-		
+
 		var iterator = elements.entrySet().iterator();
 		if(iterator.hasNext()) {
 			var elem = iterator.next();
@@ -157,7 +169,7 @@ public class JsonWriter {
 			levelAdjust(writer, level, false);
 			keyFormat(writer, elem.getKey().toString());
 			asArray(elem.getValue(), writer, level);
-			
+
 			while(iterator.hasNext()) {
 				elem = iterator.next();
 				writer.write(",\n");
@@ -166,7 +178,7 @@ public class JsonWriter {
 				asArray(elem.getValue(), writer, level);
 			}
 		}
-		
+
 		edgeFormat(writer, level, "{}", true);
 	}
 
@@ -191,7 +203,7 @@ public class JsonWriter {
 			levelAdjust(writer, level, false);
 			keyFormat(writer, elem.getKey().toString());
 			asNestedArray(elem.getValue(), writer, level);
-			
+
 			while(iterator.hasNext()) {
 				elem = iterator.next();
 				writer.write(",\n");
@@ -200,7 +212,7 @@ public class JsonWriter {
 				asNestedArray(elem.getValue(), writer, level);
 			}
 		}
-		
+
 		edgeFormat(writer, level, "{}", true);
 	}
 
