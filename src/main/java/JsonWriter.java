@@ -28,80 +28,36 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asArray(Collection<Integer> elements, Writer writer, int level) throws IOException {
+		writer.write("[");
 		level++;
-		edgeFormat(writer, 0, "[]", false); // TODO directly output [
 
 		var iterator = elements.iterator();
 		if(iterator.hasNext()) {
-			// TODO writeEntry
 			var elem = iterator.next();
-			writer.write('\n');
-			levelAdjust(writer, level, false); // TODO use the level directly
-			writer.write(elem.toString());
+			writeEntry(writer, elem.toString(), level);
 
 			while(iterator.hasNext()) {
-				// TODO output comma, then writeEntry
 				elem = iterator.next();
-				writer.write(",\n");
-				levelAdjust(writer, level, false);  // TODO use the level directly
-				writer.write(elem.toString());
+				writer.write(",");
+				writeEntry(writer, elem.toString(), level);
 			}
 		}
-
-		// TODO reduce the level by 1
-		edgeFormat(writer, level, "[]", true); // TODO directly output ]
-	}
-
-	/* TODO
-	public static void writeEntry( ) {
-		elem = iterator.next();
 		writer.write("\n");
-		levelAdjust(writer, level, false);
-		writer.write(elem.toString());
-	}
-	*/
-
-	/**
-	 * Writes the starting or ending specified brackets
-	 *
-	 * @param writer the writer to use
-	 * @param level the initial indent level
-	 * @param edgeChars the brackets needed for formatting
-	 * @param end states if the edge is at the end of Collection or not
-	 * @throws IOException if an IO error occurs
-	 */
-	private static void edgeFormat(Writer writer, int level, String edgeChars, boolean end) throws IOException{
-		if(end) {
-			writer.write("\n");
-		}
-
-		levelAdjust(writer, level, true);
-		if(!end) {
-			writer.write(edgeChars.charAt(0));
-		}
-		else {
-			writer.write(edgeChars.charAt(1));
-		}
+		writer.write("\t".repeat(--level));
+		writer.write("]");
 	}
 
-
-
 	/**
-	 * Inserts necessary amount of indents as indicated by level
-	 *
+	 * Outputs array element to writer with JSON level formatting
+	 * 
 	 * @param writer the writer to use
+	 * @param elem the element to be written in
 	 * @param level the initial indent level
-	 * @param offset determines if line needs to be one indent level less than indicated
-	 * @throws IOException if an IO error occurs
 	 */
-	private static void levelAdjust(Writer writer, int level, boolean offset) throws IOException {
-		//Backs indent level by one
-		if(offset) {
-			level -= 1;
-		}
-		for(int i = 0; i < level; i++) {
-			writer.write('\t');
-		}
+	public static void writeEntry(Writer writer, String elem, int level) throws IOException{
+		writer.write("\n");
+		writer.write("\t".repeat(level));
+		writer.write(elem);
 	}
 
 	/**
@@ -113,26 +69,37 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 */
 	public static void asObject(Map<String, Integer> elements, Writer writer, int level) throws IOException {
-		edgeFormat(writer, level++, "{}", false);
+		writer.write("{");
+		level++;
 
 		var iterator = elements.entrySet().iterator();
 		if(iterator.hasNext()) {
 			var elem = iterator.next();
-			writer.write('\n');
-			levelAdjust(writer, level, false);
-			keyFormat(writer, elem.getKey().toString());
-			writer.write(elem.getValue().toString());
+			writeKeyValueEntry(elem, writer, level);
 
 			while(iterator.hasNext()) {
 				elem = iterator.next();
-				writer.write(",\n");
-				levelAdjust(writer, level, false);
-				keyFormat(writer, elem.getKey().toString());
-				writer.write(elem.getValue().toString());
+				writer.write(",");
+				writeKeyValueEntry(elem, writer, level);
 			}
 		}
-
-		edgeFormat(writer, level, "{}", true);
+		writer.write("\n");
+		writer.write("\t".repeat(--level));
+		writer.write("}");
+	}
+	
+	/**
+	 * Outputs object element to writer with JSON level formatting
+	 * 
+	 * @param elem the element to be written in
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 */
+	public static void writeKeyValueEntry(Map.Entry<String, Integer> elem, Writer writer, int level) throws IOException{
+		writer.write("\n");
+		writer.write("\t".repeat(level));
+		keyFormat(elem.getKey(), writer);
+		writer.write(elem.getValue().toString());
 	}
 
 	/**
@@ -142,7 +109,7 @@ public class JsonWriter {
 	 * @param key the Map key for JSON key formatting
 	 * @throws IOException if an IO error occurs
 	 */
-	private static void keyFormat(Writer writer, String key) throws IOException{
+	private static void keyFormat(String key, Writer writer) throws IOException{
 		writer.write("\"");
 		writer.write(key);
 		writer.write("\": ");
@@ -160,26 +127,39 @@ public class JsonWriter {
 	 */
 	public static void asNestedArray(Map<String, ? extends Collection<Integer>> elements, Writer writer, int level)
 			throws IOException {
-		edgeFormat(writer, level++, "{}", false);
+		writer.write("{");
+		level++;
 
 		var iterator = elements.entrySet().iterator();
 		if(iterator.hasNext()) {
 			var elem = iterator.next();
-			writer.write('\n');
-			levelAdjust(writer, level, false);
-			keyFormat(writer, elem.getKey().toString());
-			asArray(elem.getValue(), writer, level);
+			writeKeyValueArrayEntry(elem, writer, level);
 
 			while(iterator.hasNext()) {
 				elem = iterator.next();
-				writer.write(",\n");
-				levelAdjust(writer, level, false);
-				keyFormat(writer, elem.getKey().toString());
-				asArray(elem.getValue(), writer, level);
+				writer.write(",");
+				writeKeyValueArrayEntry(elem, writer, level);
 			}
 		}
-
-		edgeFormat(writer, level, "{}", true);
+		writer.write("\n");
+		writer.write("\t".repeat(--level));
+		writer.write("}");
+	}
+	
+	
+	/**
+	 * Outputs nested array element to writer with JSON level formatting
+	 * 
+	 * @param elem the element to be written in
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 */
+	public static void writeKeyValueArrayEntry(Map.Entry<String, ? extends
+			Collection<Integer>> elem, Writer writer, int level) throws IOException{
+		writer.write("\n");
+		writer.write("\t".repeat(level));
+		keyFormat(elem.getKey(), writer);
+		asArray(elem.getValue(), writer, level);
 	}
 
 	/**
@@ -194,26 +174,37 @@ public class JsonWriter {
 	 */
 	public static void asNestedObject(Map<String, ? extends Map<String, ? extends Collection<Integer>>> elements,
 			Writer writer, int level) throws IOException {
-		edgeFormat(writer, level++, "{}", false);
+		writer.write("{");
+		level++;
 
 		var iterator = elements.entrySet().iterator();
 		if(iterator.hasNext()) {
 			var elem = iterator.next();
-			writer.write('\n');
-			levelAdjust(writer, level, false);
-			keyFormat(writer, elem.getKey().toString());
-			asNestedArray(elem.getValue(), writer, level);
+			writeKVObjectEntry(elem, writer, level);
 
 			while(iterator.hasNext()) {
 				elem = iterator.next();
-				writer.write(",\n");
-				levelAdjust(writer, level, false);
-				keyFormat(writer, elem.getKey().toString());
-				asNestedArray(elem.getValue(), writer, level);
+				writer.write(",");
+				writeKVObjectEntry(elem, writer, level);
 			}
 		}
-
-		edgeFormat(writer, level, "{}", true);
+		writer.write("\n");
+		writer.write("\t".repeat(--level));
+		writer.write("}");
+	}
+	
+	/**
+	 * Outputs nested object element to writer with JSON level formatting
+	 * 
+	 * @param elem the element to be written in
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 */
+	public static void writeKVObjectEntry(Map.Entry<String, ? extends Map<String, ? extends Collection<Integer>>> elem, Writer writer, int level) throws IOException{
+		writer.write("\n");
+		writer.write("\t".repeat(level));
+		keyFormat(elem.getKey(), writer);
+		asNestedArray(elem.getValue(), writer, level);
 	}
 
 
