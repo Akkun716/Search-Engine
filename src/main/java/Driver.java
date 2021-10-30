@@ -20,7 +20,7 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		// store initial start time
-		InvertedIndex index = new InvertedIndex();
+		InvertedIndexBuilder builder = new InvertedIndexBuilder();
 		Instant start = Instant.now();
 
 		ArgumentMap map = new ArgumentMap(args);
@@ -28,7 +28,7 @@ public class Driver {
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
 			try {
-				index.readFiles(map.getPath("-text"));
+				builder.readFiles(map.getPath("-text"));
 			}
 			catch(Exception e) {
 				if(input == null) {
@@ -39,11 +39,12 @@ public class Driver {
 				}
 			}
 		}
+		InvertedIndex index = builder.build();
 		
 		if(map.hasFlag("-index")) {
 			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
-				index.writeFile(output);
+				index.toJson(output);
 			}
 			catch(Exception e) {
 				System.out.println("Unable to write out to file: " + output.toString());
