@@ -1,162 +1,90 @@
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeMap;
-import java.util.TreeSet;
-
-/*
- * TODO Refactor this one to InvertedIndex
- */
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 /**
- * This class represents the data structure of the inverted index.
+ * This class holds word stems and all of the files and positions within those
+ * files they have been found in.
+ *
+ * @author Adon Anglon
  */
 public class InvertedIndexBuilder {
-	// TODO Init invertedIndex in the constructor
 	/**
-	 * This map hold the data of the inverted index. The over-arching map holds
-	 * word stem keys which are paired to respective maps that has file location
-	 * keys which are then paired to an array of positions in the file the word
-	 * stem appeared
+	 * This map will hold stemmed words as keys and a treeMap as values. Those treeMaps
+	 * will hold file locations as keys and arrayList of Integers as values. These
+	 * Integers represent the position of the stemmed word occurrences
 	 */
-	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex =
-			new TreeMap<>();
-
-	/**
-	 * Adds  word keys, file location keys, and positions in the index
-	 * (if they does not already exist in the index)
-	 *
-	 * @param word stemmed word
-	 * @param location file location where the word stem appeared
-	 * @param position position of the word stem in respective file location
-	 * @return true if the new key value pair did not exist and was added to map
-	 */
-	public boolean add(String word, String location, Integer position) {
-		invertedIndex.putIfAbsent(word, new TreeMap<>());
-		invertedIndex.get(word).putIfAbsent(location, new TreeSet<Integer>());
-		return invertedIndex.get(word).get(location).add(position);
-	}
-
-	/*
-	 * TODO
-	 *
-	 * public boolean add or addAll(List<String> words, String location) <--- call add in a loop
-	 */
-
-	// TODO Still breaking encapsulation
-	/**
-	 * Returns an unmodifiable invertedIndex for easy printing.
-	 *
-	 * @return an unmodifiable index map
-	 */
-	public Map<String, TreeMap<String, TreeSet<Integer>>> getIndex() {
-		// TODO getWords() --> returns an unmodifiable set of the invertedIndex.keySet()
-		return Collections.unmodifiableMap(invertedIndex);
+	private final InvertedIndex invertedIndex;
+	
+	public InvertedIndexBuilder() {
+		invertedIndex = new InvertedIndex();
 	}
 
 	/**
-	 * Returns an unmodifiable map of file locations of a word stem
+	 * Takes in a Path object and uses TextStemmer to parse through the text file(s) indicated
+	 * by the Path and adds them to the invertedIndex HashMap.
 	 *
-	 * @param stem word stem that needs to be accessed
-	 * @return an unmodifiable Set of positions
+	 * @param mainPath path that points to file/dir to be processed
+	 * @throws IOException file is invalid or can not be found
 	 */
-	public Map<String, TreeSet<Integer>> getLocations(String stem) {
-		// TODO return an unmodifiable view of invertedIndex.get(stem).keySet()
-		return Collections.unmodifiableMap(invertedIndex.getOrDefault(stem, new TreeMap<>()));
+	public void readFiles(Path mainPath) throws IOException{
+		if(Files.isDirectory(mainPath)) {
+			try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
+				for(Path path: stream) {
+					if(Files.isDirectory(path)) {
+						readFiles(path);
+					}
+					else if(isTextFile(path)) {
+						readFile(path);
+					}
+				}
+			}
+		}
+		else {
+			readFile(mainPath);
+		}
 	}
 
 	/**
-	 * Returns an unmodifiable Set of word stem positions at file location
-	 *
-	 * @param stem word stem that needs to be accessed
-	 * @param location file location that needs to be accessed
-	 * @return an unmodifiable Set of positions
+	 * This checks to see if a path leads to a text file
+	 * 
+	 * @param path file path to be checked
+	 * @return true if the path ends with the .txt or .text extension
 	 */
-	public Set<Integer> getPositions(String stem, String location) {
-		return hasLocation(stem, location)
-				? Collections.unmodifiableSet(invertedIndex.get(stem).get(location))
-						// TODO Collections.emptySet();
-				: Collections.unmodifiableSet(new TreeSet<>());
+	public static boolean isTextFile(Path path) {
+		return path.toString().toLowerCase().endsWith(".txt") ||
+				path.toString().toLowerCase().endsWith(".text");
 	}
 
 	/**
-	 * Checks if word stem exists as a key in index
-	 *
-	 * @param stem word stem to be found in index
-	 * @return true if word stem exists as key in map
+	 * Reads the file path into the default invertedIndex map of the builder
+	 * 
+	 * @param path file path to be read
 	 */
-	public boolean hasStem(String stem) {
-		return invertedIndex.containsKey(stem);
+	public void readFile(Path path) throws IOException {
+		readFile(path, this.invertedIndex);
 	}
 
 	/**
-	 * Checks if the word stems exists and then if location can be found
-	 *
-	 * @param stem word stem to be found in index
-	 * @param location file location to be found under word stem key
-	 * @return true if location exists under word stem key
+	 * Reads the file path into the specified invertedIndex
+	 * 
+	 * @param path file path to be read
+	 * @param invertedIndex an invertedIndex map to pass the list of stems to
+	 * @param invertedIndex the index that will append the stemmed words from the
+	 * 	file
 	 */
-	public boolean hasLocation(String stem, String location) {
-		return hasStem(stem) && invertedIndex.get(stem).containsKey(location);
+	public static void readFile(Path path, InvertedIndex invertedIndex) throws IOException {
+		invertedIndex.addAll(TextStemmer.listStems(path), path.toString());
 	}
 
 	/**
-	 * Checks if the word and location keys exists in index and then if position
-	 * can be found
+	 * Outputs the built invertedIndex
 	 *
-	 * @param stem word stem to be found in index
-	 * @param location file location to be found under word stem key
-	 * @param position position of the word stem at designated file location
-	 * @return true if position exists under word stem and designated file location
+	 * @return invertedIndex currently stored in builder
 	 */
-	public boolean hasPosition(String stem, String location, Integer position) {
-		return hasLocation(stem, location)
-				&& invertedIndex.get(stem).get(location).contains(position);
+	public InvertedIndex build() {
+		return invertedIndex;
 	}
-
-	/**
-	 * Returns number of word stem keys in index
-	 *
-	 * @return size of invertedIndex map
-	 */
-	public int stemCount() {
-		return invertedIndex.size();
-	}
-
-	/**
-	 * Returns number of file locations under word stem key in index
-	 *
-	 * @param stem word stem key to be accessed
-	 * @return size of map assigned to word stem if exists; else 0
-	 */
-	public int locationCount(String stem) {
-		return hasStem(stem)
-				? invertedIndex.get(stem).size()
-				: 0;
-	}
-
-	/**
-	 * Returns number of positions under respective file location and word stem
-	 * keys in index
-	 *
-	 * @param stem word stem key to be accessed
-	 * @param location file location to be found under word stem key
-	 * @return size of set assigned to location of word stem if exists; else 0
-	 */
-	public int positionCount(String stem, String location) {
-		return hasLocation(stem, location)
-				? invertedIndex.get(stem).get(location).size()
-				: 0;
-	}
-
-	@Override
-	public String toString() {
-		return this.invertedIndex.toString();
-	}
-
-	/* TODO
-	public void toJson(Path output) throws IOException {
-		JsonWriter.asNestedObject(invertedIndex, output);
-	}
-	*/
+	
 }
