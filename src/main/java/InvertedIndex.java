@@ -20,7 +20,7 @@ public class InvertedIndex {
 	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 	
 	/**
-	 * Initializes invertedIndex to empty TreeMap<>()
+	 * Initializes invertedIndex to empty TreeMap object
 	 */
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<>();
