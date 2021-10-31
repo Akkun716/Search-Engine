@@ -17,6 +17,9 @@ public class InvertedIndexBuilder {
 	 */
 	private final InvertedIndex invertedIndex;
 	
+	/**
+	 * Initializes empty invertedIndex
+	 */
 	public InvertedIndexBuilder() {
 		invertedIndex = new InvertedIndex();
 	}
@@ -61,6 +64,7 @@ public class InvertedIndexBuilder {
 	 * Reads the file path into the default invertedIndex map of the builder
 	 * 
 	 * @param path file path to be read
+	 * @throws IOException file is invalid or can not be found
 	 */
 	public void readFile(Path path) throws IOException {
 		readFile(path, this.invertedIndex);
@@ -73,6 +77,7 @@ public class InvertedIndexBuilder {
 	 * @param invertedIndex an invertedIndex map to pass the list of stems to
 	 * @param invertedIndex the index that will append the stemmed words from the
 	 * 	file
+	 * @throws IOException file is invalid or can not be found
 	 */
 	public static void readFile(Path path, InvertedIndex invertedIndex) throws IOException {
 		invertedIndex.addAll(TextStemmer.listStems(path), path.toString());
