@@ -19,6 +19,9 @@ public class InvertedIndex {
 	 */
 	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 	
+	/**
+	 * Initializes invertedIndex to empty TreeMap<>()
+	 */
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<>();
 	}
@@ -42,7 +45,7 @@ public class InvertedIndex {
 	 * Adds  word keys, file location keys, and positions in the index
 	 * (if they does not already exist in the index).
 	 *
-	 * @param word stemmed word
+	 * @param words list of stemmed words
 	 * @param location file location where the word stem appeared
 	 */
 	public void addAll(List<String> words, String location) {
