@@ -74,7 +74,6 @@ public class InvertedIndexBuilder {
 	 * Reads the file path into the specified invertedIndex
 	 * 
 	 * @param path file path to be read
-	 * @param invertedIndex an invertedIndex map to pass the list of stems to
 	 * @param invertedIndex the index that will append the stemmed words from the
 	 * 	file
 	 * @throws IOException file is invalid or can not be found
