@@ -53,6 +53,7 @@ public class JsonWriter {
 	 * @param writer the writer to use
 	 * @param elem the element to be written in
 	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
 	 */
 	public static void writeEntry(Writer writer, String elem, int level) throws IOException{
 		writer.write("\n");
@@ -94,6 +95,7 @@ public class JsonWriter {
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
 	 */
 	public static void writeKeyValueEntry(Map.Entry<String, Integer> elem, Writer writer, int level) throws IOException{
 		writer.write("\n");
@@ -153,6 +155,7 @@ public class JsonWriter {
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
 	 */
 	public static void writeKeyValueArrayEntry(Map.Entry<String, ? extends
 			Collection<Integer>> elem, Writer writer, int level) throws IOException{
@@ -199,6 +202,7 @@ public class JsonWriter {
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
 	 */
 	public static void writeKVObjectEntry(Map.Entry<String, ? extends Map<String, ? extends Collection<Integer>>> elem, Writer writer, int level) throws IOException{
 		writer.write("\n");

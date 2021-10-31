@@ -13,10 +13,13 @@ public class InvertedIndexBuilder {
 	/**
 	 * This map will hold stemmed words as keys and a treeMap as values. Those treeMaps
 	 * will hold file locations as keys and arrayList of Integers as values. These
-	 * Integers represent the position of the stemmed word occurrences
+	 * Integers represent the position of the stemmed word occurrences.
 	 */
 	private final InvertedIndex invertedIndex;
 	
+	/**
+	 * Initializes invertedIndex to a new empty InvertedIndex object
+	 */
 	public InvertedIndexBuilder() {
 		invertedIndex = new InvertedIndex();
 	}
@@ -47,7 +50,7 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * This checks to see if a path leads to a text file
+	 * This checks to see if a path leads to a text file.
 	 * 
 	 * @param path file path to be checked
 	 * @return true if the path ends with the .txt or .text extension
@@ -58,7 +61,7 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * Reads the file path into the default invertedIndex map of the builder
+	 * Reads the file path into the default invertedIndex map of the builder.
 	 * 
 	 * @param path file path to be read
 	 */
@@ -67,10 +70,9 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * Reads the file path into the specified invertedIndex
+	 * Reads the file path into the specified invertedIndex.
 	 * 
 	 * @param path file path to be read
-	 * @param invertedIndex an invertedIndex map to pass the list of stems to
 	 * @param invertedIndex the index that will append the stemmed words from the
 	 * 	file
 	 */
@@ -79,7 +81,7 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * Outputs the built invertedIndex
+	 * Outputs the built invertedIndex.
 	 *
 	 * @return invertedIndex currently stored in builder
 	 */

@@ -25,6 +25,9 @@ public class InvertedIndex {
 	 */
 	private final Map<String, Integer> wordCount;
 	
+	/**
+	 * Initializes invertedIndex and wordCount to new empty TreeMap objects
+	 */
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<>();
 		wordCount = new TreeMap<>();
@@ -49,7 +52,7 @@ public class InvertedIndex {
 	 * Adds  word keys, file location keys, and positions in the index
 	 * (if they does not already exist in the index).
 	 *
-	 * @param word stemmed word
+	 * @param words list of stemmed words
 	 * @param location file location where the word stem appeared
 	 */
 	public void addAll(List<String> words, String location) {
@@ -74,7 +77,7 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * Sets a word count value to a file location key
+	 * Sets a word count value to a file location key.
 	 * 
 	 * @param location name of file location to be assigned as key
 	 * @param count word count of referenced file
