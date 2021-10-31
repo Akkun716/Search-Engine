@@ -41,7 +41,7 @@ public class Driver {
 		}
 		
 		InvertedIndex index = builder.build();
-		
+		 
 		if(map.hasFlag("-index")) {
 			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
