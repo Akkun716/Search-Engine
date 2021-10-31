@@ -19,8 +19,15 @@ public class InvertedIndex {
 	 */
 	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 	
+	/**
+	 * This WordCount map holds the word count of the files included in the
+	 * invertedIndex map.
+	 */
+	private final Map<String, Integer> wordCount;
+	
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<>();
+		wordCount = new TreeMap<>();
 	}
 
 	/**
@@ -50,6 +57,35 @@ public class InvertedIndex {
 		for(String word: words) {
 			add(word, location, i++);
 		}
+		addWordCount(location, i - 1);
+	}
+	
+	/**
+	 * Adds the word count of a file to the wordCount map.
+	 * 
+	 * @param location file location being referenced
+	 * @param count the word count of the file location
+	 * @return true if the count param changes the stored value in wordCount
+	 */
+	public boolean addWordCount(String location, Integer count) {
+		return count > 0
+				? setWordCount(location, count)
+				: false;
+	}
+	
+	/**
+	 * Sets a word count value to a file location key
+	 * 
+	 * @param location name of file location to be assigned as key
+	 * @param count word count of referenced file
+	 * @return true if the map is updated with new (or changed) key value pair
+	 */
+	public boolean setWordCount(String location, Integer count) {
+		if(wordCount.containsKey(location) && wordCount.get(location) == count) {
+				return false;
+		}
+		wordCount.put(location, count);
+		return true;
 	}
 
 	/**
@@ -171,5 +207,16 @@ public class InvertedIndex {
 	 */
 	public void indexToJson(Path output) throws IOException {
 			JsonWriter.asNestedObject(invertedIndex, output);
+	}
+	
+	/**
+	 * Utilizes the JsonWriter class and writes out wordCount in JSON format out
+	 * to output file.
+	 *
+	 * @param output path to the output file
+	 * @throws IOException file is invalid or can not be found
+	 */
+	public void countToJson(Path output) throws IOException {
+			JsonWriter.asObject(wordCount, output);
 	}
 }
