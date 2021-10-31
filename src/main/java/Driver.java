@@ -39,6 +39,7 @@ public class Driver {
 				}
 			}
 		}
+		
 		InvertedIndex index = builder.build();
 		
 		if(map.hasFlag("-index")) {
