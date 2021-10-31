@@ -75,7 +75,7 @@ public class InvertedIndex {
 	}
 
 	/**
-	 * Returns an unmodifiable Set of word stem positions at file location
+	 * Returns an unmodifiable Set of word stem positions at file location.
 	 *
 	 * @param stem word stem that needs to be accessed
 	 * @param location file location that needs to be accessed
@@ -88,7 +88,7 @@ public class InvertedIndex {
 	}
 
 	/**
-	 * Checks if word stem exists as a key in index
+	 * Checks if word stem exists as a key in index.
 	 *
 	 * @param stem word stem to be found in index
 	 * @return true if word stem exists as key in map
@@ -98,7 +98,7 @@ public class InvertedIndex {
 	}
 
 	/**
-	 * Checks if the word stems exists and then if location can be found
+	 * Checks if the word stems exists and then if location can be found.
 	 *
 	 * @param stem word stem to be found in index
 	 * @param location file location to be found under word stem key
@@ -110,7 +110,7 @@ public class InvertedIndex {
 
 	/**
 	 * Checks if the word and location keys exists in index and then if position
-	 * can be found
+	 * can be found.
 	 *
 	 * @param stem word stem to be found in index
 	 * @param location file location to be found under word stem key
@@ -123,7 +123,7 @@ public class InvertedIndex {
 	}
 
 	/**
-	 * Returns number of word stem keys in index
+	 * Returns number of word stem keys in index.
 	 *
 	 * @return size of invertedIndex map
 	 */
@@ -132,7 +132,7 @@ public class InvertedIndex {
 	}
 
 	/**
-	 * Returns number of file locations under word stem key in index
+	 * Returns number of file locations under word stem key in index.
 	 *
 	 * @param stem word stem key to be accessed
 	 * @return size of map assigned to word stem if exists; else 0
@@ -145,7 +145,7 @@ public class InvertedIndex {
 
 	/**
 	 * Returns number of positions under respective file location and word stem
-	 * keys in index
+	 * keys in index.
 	 *
 	 * @param stem word stem key to be accessed
 	 * @param location file location to be found under word stem key
