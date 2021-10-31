@@ -41,10 +41,20 @@ public class Driver {
 		}
 		InvertedIndex index = builder.build();
 		
+		if(map.hasFlag("-counts")) {
+			Path output = map.getPath("-counts", Path.of("counts.json"));
+			try {
+				index.countToJson(output);
+			}
+			catch(Exception e) {
+				System.out.println("Unable to write out to file: " + output.toString());
+			}
+		}
+		
 		if(map.hasFlag("-index")) {
 			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
-				index.toJson(output);
+				index.indexToJson(output);
 			}
 			catch(Exception e) {
 				System.out.println("Unable to write out to file: " + output.toString());
