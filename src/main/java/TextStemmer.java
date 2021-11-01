@@ -28,6 +28,14 @@ public class TextStemmer {
 	/** The default character set used by this class. */
 	public static final Charset UTF8 = StandardCharsets.UTF_8;
 
+	/* TODO
+	public static void stemLine(String line, Stemmer stemmer, Collection<String> output) {
+		for(String word: TextParser.parse(line)) {
+			output.add(stemmer.stem(word).toString());
+		}
+	}
+	*/
+
 	/**
 	 * Parses each line into cleaned and stemmed words.
 	 *
@@ -43,6 +51,10 @@ public class TextStemmer {
 		for(String word: TextParser.parse(line)) {
 			output.add(stemmer.stem(word.toLowerCase()).toString());
 		}
+
+		/* TODO
+		List<String> output = new ArrayList<>();
+		stemLine(line, stemer, output); */
 		return output;
 	}
 
@@ -74,6 +86,28 @@ public class TextStemmer {
 	 */
 	public static List<String> listStems(Path input) throws IOException {
 		List<String> temp, output = new ArrayList<>();
+		/*
+		 * TODO Efficiency problems
+		 *
+		 * 1) readAllLines is not efficient for large files
+		 *
+		 * Suppose we have a file with 1000 lines in it...
+		 * - creates 1001 lists
+		 * - creates 1000 stemmers
+		 * - do 1000 addAll copy operations
+		 *
+		 * Regardless of the file size, we only need:
+		 * - 1 list
+		 * - 1 stemmer
+		 * - 0 copies
+		 *
+		 * create a stemer object
+		 * create 1 output list
+		 * buffered reader, read line by line
+		 *    stemLine(line, stemmer, output);
+		 *
+		 * Do something similar for uniqueStems(path) too
+		 */
 		for(String line: Files.readAllLines(input)) {
 			temp = listStems(line);
 			Collections.addAll(output, temp.toArray(new String[temp.size()]));
@@ -93,7 +127,8 @@ public class TextStemmer {
 	 */
 	public static Set<String> uniqueStems(String line, Stemmer stemmer) {
 		Set<String> output = new TreeSet<>();
-		for(String word: TextParser.parse(line)) {
+		// TODO use stemLine here!
+		for(String word: TextParser.parse(line)) { // TODO Duplicate code
 			output.add(stemmer.stem(word.toLowerCase()).toString());
 		}
 		return output;
@@ -128,7 +163,7 @@ public class TextStemmer {
 	 */
 	public static Set<String> uniqueStems(Path input) throws IOException {
 		Set<String> output = new TreeSet<>();
-		for(String line: Files.readAllLines(input)) {
+		for(String line: Files.readAllLines(input)) { // TODO Same issue
 			output.addAll(uniqueStems(line));
 		}
 		return output;
@@ -150,8 +185,9 @@ public class TextStemmer {
 	 */
 	public static List<Set<String>> listUniqueStems(Path input) throws IOException {
 		ArrayList<Set<String>> output = new ArrayList<Set<String>>();
-		for(String line: Files.readAllLines(input)) {
-			output.add(uniqueStems(line));
+		// TODO Stemmer stemmer =
+		for(String line: Files.readAllLines(input)) { // TODO buffered reading
+			output.add(uniqueStems(line)); // TODO uniqueStems(line, stemmer)
 		}
 		return output;
 	}
