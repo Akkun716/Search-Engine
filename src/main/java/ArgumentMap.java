@@ -46,7 +46,8 @@ public class ArgumentMap {
 		for(int i = 0; i < args.length - 1; i++) {
 			if(isFlag(args[i])) {
 				if(isValue(args[i + 1])) {
-					if(map.containsKey(args[i])) {
+					// TODO map.put(args[i], args[++i]);
+					if(map.containsKey(args[i])) { // TODO Remove
 						map.replace(args[i], args[++i]);
 					}
 					else {
@@ -165,6 +166,7 @@ public class ArgumentMap {
 	 * @see Path#of(String, String...)
 	 */
 	public Path getPath(String flag) {
+		// TODO return getPath(flag, null)
 		String output = getString(flag);
 		if(output == null) {
 			return null;
@@ -213,6 +215,15 @@ public class ArgumentMap {
 			output = defaultValue;
 		}
 		return output;
+
+		/* TODO
+		try {
+			return Integer.parseInt(getString(flag));
+		}
+		catch(NumberFormatException | NullPointerException e) {
+			return defaultValue;
+		}
+		*/
 	}
 
 	/**
@@ -225,6 +236,7 @@ public class ArgumentMap {
 	 *   is no valid mapping
 	 */
 	public Integer getInteger(String flag) {
+		// TODO return getInteger(flag, null);
 		Integer output;
 		try {
 			output = Integer.parseInt(getString(flag));

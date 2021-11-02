@@ -16,11 +16,11 @@ public class InvertedIndexBuilder {
 	 * Integers represent the position of the stemmed word occurrences
 	 */
 	private final InvertedIndex invertedIndex;
-	
+
 	/**
 	 * Initializes empty invertedIndex
 	 */
-	public InvertedIndexBuilder() {
+	public InvertedIndexBuilder() { // TODO Pass in the inverted index you want to build here instead
 		invertedIndex = new InvertedIndex();
 	}
 
@@ -32,6 +32,19 @@ public class InvertedIndexBuilder {
 	 * @throws IOException file is invalid or can not be found
 	 */
 	public void readFiles(Path mainPath) throws IOException{
+		/* TODO
+		try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
+			for(Path path: stream) {
+				if(Files.isDirectory(path)) {
+					readFiles(path);
+				}
+				else if(isTextFile(path)) {
+					readFile(path);
+				}
+			}
+		}
+		*/
+
 		if(Files.isDirectory(mainPath)) {
 			try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
 				for(Path path: stream) {
@@ -51,7 +64,7 @@ public class InvertedIndexBuilder {
 
 	/**
 	 * This checks to see if a path leads to a text file
-	 * 
+	 *
 	 * @param path file path to be checked
 	 * @return true if the path ends with the .txt or .text extension
 	 */
@@ -62,7 +75,7 @@ public class InvertedIndexBuilder {
 
 	/**
 	 * Reads the file path into the default invertedIndex map of the builder
-	 * 
+	 *
 	 * @param path file path to be read
 	 * @throws IOException file is invalid or can not be found
 	 */
@@ -72,13 +85,19 @@ public class InvertedIndexBuilder {
 
 	/**
 	 * Reads the file path into the specified invertedIndex
-	 * 
+	 *
 	 * @param path file path to be read
 	 * @param invertedIndex the index that will append the stemmed words from the
 	 * 	file
 	 * @throws IOException file is invalid or can not be found
 	 */
 	public static void readFile(Path path, InvertedIndex invertedIndex) throws IOException {
+		/*
+		 * TODO General but not efficient
+		 *
+		 * buffered reader, read line by line, parse the line, and as soon
+		 * as you have a stemmed word, add it directly to the index, never to a list
+		 */
 		invertedIndex.addAll(TextStemmer.listStems(path), path.toString());
 	}
 
@@ -87,8 +106,17 @@ public class InvertedIndexBuilder {
 	 *
 	 * @return invertedIndex currently stored in builder
 	 */
-	public InvertedIndex build() {
+	public InvertedIndex build() { // TODO return void, take in a Path mainPath
+		/* TODO
+		if(Files.isDirectory(mainPath)) {
+			readFiles(mainPath);
+		}
+		else {
+			readFile(mainPath);
+		}
+		*/
+
 		return invertedIndex;
 	}
-	
+
 }

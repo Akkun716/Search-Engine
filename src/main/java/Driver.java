@@ -20,6 +20,12 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		// store initial start time
+
+		/* TODO
+		InvertedIndex index = new InvertedIndex();
+		InvertedIndexBuilder builder = new InvertedIndexBuilder(index);
+		*/
+
 		InvertedIndexBuilder builder = new InvertedIndexBuilder();
 		Instant start = Instant.now();
 
@@ -28,6 +34,7 @@ public class Driver {
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
 			try {
+				// TODO builder.build(input);
 				builder.readFiles(map.getPath("-text"));
 			}
 			catch(Exception e) {
@@ -39,9 +46,9 @@ public class Driver {
 				}
 			}
 		}
-		
-		InvertedIndex index = builder.build();
-		 
+
+		InvertedIndex index = builder.build(); // TODO Remove
+
 		if(map.hasFlag("-index")) {
 			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
