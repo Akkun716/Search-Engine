@@ -18,7 +18,7 @@ public class InvertedIndexBuilder {
 	private final InvertedIndex invertedIndex;
 	
 	/**
-	 * Initializes invertedIndex to a new empty InvertedIndex object
+	 * Initializes invertedIndex to a new empty InvertedIndex object.
 	 */
 	public InvertedIndexBuilder() {
 		invertedIndex = new InvertedIndex();

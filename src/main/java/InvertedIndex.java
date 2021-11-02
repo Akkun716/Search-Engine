@@ -25,12 +25,15 @@ public class InvertedIndex {
 	 */
 	private final Map<String, Integer> wordCount;
 	
+	private final QueryResult queryResult;
+	
 	/**
-	 * Initializes invertedIndex and wordCount to new empty TreeMap objects
+	 * Initializes invertedIndex and wordCount to new empty TreeMap objects.
 	 */
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<>();
 		wordCount = new TreeMap<>();
+		queryResult = new QueryResult();
 	}
 
 	/**
@@ -221,5 +224,17 @@ public class InvertedIndex {
 	 */
 	public void countToJson(Path output) throws IOException {
 			JsonWriter.asObject(wordCount, output);
+	}
+	
+	/**
+	 * Utilizes the JsonWriter class and writes out queryResult in JSON format out
+	 * to output file.
+	 *
+	 * @param output path to the output file
+	 * @throws IOException file is invalid or can not be found
+	 */
+	public void resultToJson(Path output) throws IOException {
+//		TODO: output results to JSON
+//			JsonWriter.asObject(wordCount, output);
 	}
 }
