@@ -28,7 +28,7 @@ public class Driver {
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
 			try {
-				builder.readFiles(map.getPath("-text"));
+				builder.readFiles(input);
 			}
 			catch(Exception e) {
 				if(input == null) {
@@ -38,6 +38,29 @@ public class Driver {
 					System.out.println("Unable to build the inverted index from path: " + input.toString());
 				}
 			}
+		}
+		
+		if(map.hasFlag("-query")) {
+			Path input = map.getPath("-query");
+			try {
+				builder.readFiles(input);
+			}
+			catch(Exception e) {
+				System.out.println("Unable to search from path: " + input.toString());
+			}
+		}
+		
+		if(map.hasFlag("-exact")) {
+			/**
+			 * TODO
+			 * Exact functionality
+			 */
+		}
+		else {
+			/**
+			 * TODO
+			 * Partial functionality
+			 */
 		}
 		
 		InvertedIndex index = builder.build();
@@ -56,6 +79,19 @@ public class Driver {
 			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
 				index.indexToJson(output);
+			}
+			catch(Exception e) {
+				System.out.println("Unable to write out to file: " + output.toString());
+			}
+		}
+		
+		if(map.hasFlag("-results")) {
+			Path output = map.getPath("-results", Path.of("results.json"));
+			try {
+				/*
+					TODO
+					index.resultToJson(output);
+				*/
 			}
 			catch(Exception e) {
 				System.out.println("Unable to write out to file: " + output.toString());
