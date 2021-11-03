@@ -32,7 +32,6 @@ public class Driver {
 			Path input = map.getPath("-text");
 			try {
 				builder.build(input);
-				builder.readFiles(map.getPath("-text"));
 			}
 			catch(Exception e) {
 				if(input == null) {
