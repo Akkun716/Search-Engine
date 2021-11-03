@@ -1,9 +1,11 @@
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -28,13 +30,19 @@ public class TextStemmer {
 	/** The default character set used by this class. */
 	public static final Charset UTF8 = StandardCharsets.UTF_8;
 
-	/* TODO
+	/**
+	 * This stems the words in a line and adds them to the collection object passed
+	 * in the function
+	 * 
+	 * @param line line of text to be parsed and each word stemmed
+	 * @param stemmer Stemmer object instance which will clean and parse the line
+	 * @param output Collection object each stemmed word will be added to 
+	 */
 	public static void stemLine(String line, Stemmer stemmer, Collection<String> output) {
 		for(String word: TextParser.parse(line)) {
 			output.add(stemmer.stem(word).toString());
 		}
 	}
-	*/
 
 	/**
 	 * Parses each line into cleaned and stemmed words.
@@ -43,18 +51,11 @@ public class TextStemmer {
 	 * @param stemmer the stemmer to use
 	 * @return a list of cleaned and stemmed words in parsed order
 	 *
-	 * @see Stemmer#stem(CharSequence)
-	 * @see TextParser#parse(String)
+	 * @see stemLine(String, Stemmer, Collection)
 	 */
 	public static List<String> listStems(String line, Stemmer stemmer) {
 		List<String> output = new ArrayList<>();
-		for(String word: TextParser.parse(line)) {
-			output.add(stemmer.stem(word.toLowerCase()).toString());
-		}
-
-		/* TODO
-		List<String> output = new ArrayList<>();
-		stemLine(line, stemer, output); */
+		stemLine(line, stemmer, output);
 		return output;
 	}
 
@@ -73,6 +74,26 @@ public class TextStemmer {
 	}
 
 	/**
+	 * Rather than just a single line (like in listStem), a file is read through
+	 * via BufferedReader and listStem is called on each line
+	 * 
+	 * @param input the file path to be parsed each word stemmed
+	 * @param output the Collection object each stemmed word will be added to
+	 * 
+	 * @see SnowballStemmer
+	 * @see #ENGLISH
+	 * @see listStems(String, Stemmer, output)
+	 */
+	public static void bufferedStem(Path input, Collection<String> output) throws IOException {
+		BufferedReader br = Files.newBufferedReader(input);
+		Stemmer stemmer = new SnowballStemmer(ENGLISH);
+		String line;
+		while((line = br.readLine()) != null) {
+			stemLine(line, stemmer, output);
+		}
+	}
+	
+	/**
 	 * Reads a file line by line, parses each line into cleaned and stemmed words
 	 * using the default stemmer.
 	 *
@@ -80,38 +101,11 @@ public class TextStemmer {
 	 * @return a list of stems from file in parsed order
 	 * @throws IOException if unable to read or parse file
 	 *
-	 * @see #UTF8
-	 * @see #uniqueStems(String, Stemmer)
-	 * @see TextParser#parse(String)
+	 * @see bufferedStem(Path, Collection)
 	 */
 	public static List<String> listStems(Path input) throws IOException {
-		List<String> temp, output = new ArrayList<>();
-		/*
-		 * TODO Efficiency problems
-		 *
-		 * 1) readAllLines is not efficient for large files
-		 *
-		 * Suppose we have a file with 1000 lines in it...
-		 * - creates 1001 lists
-		 * - creates 1000 stemmers
-		 * - do 1000 addAll copy operations
-		 *
-		 * Regardless of the file size, we only need:
-		 * - 1 list
-		 * - 1 stemmer
-		 * - 0 copies
-		 *
-		 * create a stemer object
-		 * create 1 output list
-		 * buffered reader, read line by line
-		 *    stemLine(line, stemmer, output);
-		 *
-		 * Do something similar for uniqueStems(path) too
-		 */
-		for(String line: Files.readAllLines(input)) {
-			temp = listStems(line);
-			Collections.addAll(output, temp.toArray(new String[temp.size()]));
-		}
+		List<String> output = new ArrayList<>();
+		bufferedStem(input, output);
 		return output;
 	}
 
@@ -122,15 +116,11 @@ public class TextStemmer {
 	 * @param stemmer the stemmer to use
 	 * @return a sorted set of unique cleaned and stemmed words
 	 *
-	 * @see Stemmer#stem(CharSequence)
-	 * @see TextParser#parse(String)
+	 * @see stemLine(String, Stemmer, Collection)
 	 */
 	public static Set<String> uniqueStems(String line, Stemmer stemmer) {
 		Set<String> output = new TreeSet<>();
-		// TODO use stemLine here!
-		for(String word: TextParser.parse(line)) { // TODO Duplicate code
-			output.add(stemmer.stem(word.toLowerCase()).toString());
-		}
+		stemLine(line, stemmer, output);
 		return output;
 	}
 
@@ -157,15 +147,11 @@ public class TextStemmer {
 	 * @return a sorted set of unique cleaned and stemmed words from file
 	 * @throws IOException if unable to read or parse file
 	 *
-	 * @see #UTF8
-	 * @see #uniqueStems(String, Stemmer)
-	 * @see TextParser#parse(String)
+	 * @see bufferedStem(Path, Collection)
 	 */
 	public static Set<String> uniqueStems(Path input) throws IOException {
 		Set<String> output = new TreeSet<>();
-		for(String line: Files.readAllLines(input)) { // TODO Same issue
-			output.addAll(uniqueStems(line));
-		}
+		bufferedStem(input, output);
 		return output;
 	}
 
@@ -185,9 +171,12 @@ public class TextStemmer {
 	 */
 	public static List<Set<String>> listUniqueStems(Path input) throws IOException {
 		ArrayList<Set<String>> output = new ArrayList<Set<String>>();
-		// TODO Stemmer stemmer =
-		for(String line: Files.readAllLines(input)) { // TODO buffered reading
-			output.add(uniqueStems(line)); // TODO uniqueStems(line, stemmer)
+		BufferedReader br = Files.newBufferedReader(input);
+		Stemmer stemmer = new SnowballStemmer(ENGLISH);
+		String line;
+		
+		while((line = br.readLine()) != null) {
+			output.add(uniqueStems(line, stemmer));
 		}
 		return output;
 	}
