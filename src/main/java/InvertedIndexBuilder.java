@@ -1,7 +1,11 @@
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import opennlp.tools.stemmer.Stemmer;
+import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 /**
  * This class holds word stems and all of the files and positions within those
@@ -13,15 +17,17 @@ public class InvertedIndexBuilder {
 	/**
 	 * This map will hold stemmed words as keys and a treeMap as values. Those treeMaps
 	 * will hold file locations as keys and arrayList of Integers as values. These
-	 * Integers represent the position of the stemmed word occurrences.
+	 * Integers represent the position of the stemmed word occurrences
 	 */
 	private final InvertedIndex invertedIndex;
-	
+
 	/**
-	 * Initializes invertedIndex to a new empty InvertedIndex object.
+	 * Passes an invertedIndex into the class to be alterable.
+	 * 
+	 * @param invertedIndex invertedIndex to be entered
 	 */
-	public InvertedIndexBuilder() {
-		invertedIndex = new InvertedIndex();
+	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
+		this.invertedIndex = invertedIndex;
 	}
 
 	/**
@@ -32,26 +38,21 @@ public class InvertedIndexBuilder {
 	 * @throws IOException file is invalid or can not be found
 	 */
 	public void readFiles(Path mainPath) throws IOException{
-		if(Files.isDirectory(mainPath)) {
-			try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
-				for(Path path: stream) {
-					if(Files.isDirectory(path)) {
-						readFiles(path);
-					}
-					else if(isTextFile(path)) {
-						readFile(path);
-					}
+		try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
+			for(Path path: stream) {
+				if(Files.isDirectory(path)) {
+					readFiles(path);
+				}
+				else if(isTextFile(path)) {
+					readFile(path);
 				}
 			}
-		}
-		else {
-			readFile(mainPath);
 		}
 	}
 
 	/**
 	 * This checks to see if a path leads to a text file.
-	 * 
+	 *
 	 * @param path file path to be checked
 	 * @return true if the path ends with the .txt or .text extension
 	 */
@@ -62,8 +63,9 @@ public class InvertedIndexBuilder {
 
 	/**
 	 * Reads the file path into the default invertedIndex map of the builder.
-	 * 
+	 *
 	 * @param path file path to be read
+	 * @throws IOException file is invalid or can not be found
 	 */
 	public void readFile(Path path) throws IOException {
 		readFile(path, this.invertedIndex);
@@ -71,13 +73,22 @@ public class InvertedIndexBuilder {
 
 	/**
 	 * Reads the file path into the specified invertedIndex.
-	 * 
+	 *
 	 * @param path file path to be read
 	 * @param invertedIndex the index that will append the stemmed words from the
 	 * 	file
+	 * @throws IOException file is invalid or can not be found
 	 */
 	public static void readFile(Path path, InvertedIndex invertedIndex) throws IOException {
-		invertedIndex.addAll(TextStemmer.listStems(path), path.toString());
+		BufferedReader br = Files.newBufferedReader(path);
+		Stemmer stemmer = new SnowballStemmer(TextStemmer.ENGLISH);
+		String line, pathString = path.toString();
+		int i = 1;
+		while((line = br.readLine()) != null) {
+			for(String word: TextParser.parse(line)) {
+				invertedIndex.add(stemmer.stem(word).toString(), pathString, i++);
+			}
+		}
 	}
 
 	/**
@@ -85,8 +96,13 @@ public class InvertedIndexBuilder {
 	 *
 	 * @return invertedIndex currently stored in builder
 	 */
-	public InvertedIndex build() {
-		return invertedIndex;
+	public void build(Path mainPath) throws IOException{
+		if(Files.isDirectory(mainPath)) {
+			readFiles(mainPath);
+		}
+		else {
+			readFile(mainPath);
+		}
 	}
-	
+
 }
