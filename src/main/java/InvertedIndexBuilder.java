@@ -1,7 +1,11 @@
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import opennlp.tools.stemmer.Stemmer;
+import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 /**
  * This class holds word stems and all of the files and positions within those
@@ -20,8 +24,8 @@ public class InvertedIndexBuilder {
 	/**
 	 * Initializes empty invertedIndex
 	 */
-	public InvertedIndexBuilder() { // TODO Pass in the inverted index you want to build here instead
-		invertedIndex = new InvertedIndex();
+	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
+		this.invertedIndex = invertedIndex;
 	}
 
 	/**
@@ -32,7 +36,6 @@ public class InvertedIndexBuilder {
 	 * @throws IOException file is invalid or can not be found
 	 */
 	public void readFiles(Path mainPath) throws IOException{
-		/* TODO
 		try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
 			for(Path path: stream) {
 				if(Files.isDirectory(path)) {
@@ -42,23 +45,6 @@ public class InvertedIndexBuilder {
 					readFile(path);
 				}
 			}
-		}
-		*/
-
-		if(Files.isDirectory(mainPath)) {
-			try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
-				for(Path path: stream) {
-					if(Files.isDirectory(path)) {
-						readFiles(path);
-					}
-					else if(isTextFile(path)) {
-						readFile(path);
-					}
-				}
-			}
-		}
-		else {
-			readFile(mainPath);
 		}
 	}
 
@@ -92,13 +78,15 @@ public class InvertedIndexBuilder {
 	 * @throws IOException file is invalid or can not be found
 	 */
 	public static void readFile(Path path, InvertedIndex invertedIndex) throws IOException {
-		/*
-		 * TODO General but not efficient
-		 *
-		 * buffered reader, read line by line, parse the line, and as soon
-		 * as you have a stemmed word, add it directly to the index, never to a list
-		 */
-		invertedIndex.addAll(TextStemmer.listStems(path), path.toString());
+		BufferedReader br = Files.newBufferedReader(path);
+		Stemmer stemmer = new SnowballStemmer(TextStemmer.ENGLISH);
+		String line, pathString = path.toString();
+		int i = 1;
+		while((line = br.readLine()) != null) {
+			for(String word: TextParser.parse(line)) {
+				invertedIndex.add(stemmer.stem(word).toString(), pathString, i++);
+			}
+		}
 	}
 
 	/**
@@ -106,17 +94,13 @@ public class InvertedIndexBuilder {
 	 *
 	 * @return invertedIndex currently stored in builder
 	 */
-	public InvertedIndex build() { // TODO return void, take in a Path mainPath
-		/* TODO
+	public void build(Path mainPath) throws IOException{
 		if(Files.isDirectory(mainPath)) {
 			readFiles(mainPath);
 		}
 		else {
 			readFile(mainPath);
 		}
-		*/
-
-		return invertedIndex;
 	}
 
 }
