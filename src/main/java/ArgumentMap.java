@@ -46,13 +46,7 @@ public class ArgumentMap {
 		for(int i = 0; i < args.length - 1; i++) {
 			if(isFlag(args[i])) {
 				if(isValue(args[i + 1])) {
-					// TODO map.put(args[i], args[++i]);
-					if(map.containsKey(args[i])) { // TODO Remove
-						map.replace(args[i], args[++i]);
-					}
-					else {
-						map.put(args[i], args[++i]);
-					}
+					map.put(args[i], args[++i]);
 				}
 				else {
 					map.put(args[i], null);
@@ -145,7 +139,7 @@ public class ArgumentMap {
 	 *   value if there is no mapping
 	 */
 	public String getString(String flag, String defaultValue) {
-		String output = map.get(flag);
+		String output = getString(flag);
 		if(output == null) {
 			output = defaultValue;
 		}
@@ -166,12 +160,7 @@ public class ArgumentMap {
 	 * @see Path#of(String, String...)
 	 */
 	public Path getPath(String flag) {
-		// TODO return getPath(flag, null)
-		String output = getString(flag);
-		if(output == null) {
-			return null;
-		}
-		return Path.of(output);
+		return getPath(flag, null);
 	}
 
 	/**
@@ -207,23 +196,12 @@ public class ArgumentMap {
 	 *   value if there is no valid mapping
 	 */
 	public Integer getInteger(String flag, Integer defaultValue) {
-		Integer output;
-		try {
-			output = Integer.parseInt(getString(flag));
-		}
-		catch(NumberFormatException e) {
-			output = defaultValue;
-		}
-		return output;
-
-		/* TODO
 		try {
 			return Integer.parseInt(getString(flag));
 		}
 		catch(NumberFormatException | NullPointerException e) {
 			return defaultValue;
 		}
-		*/
 	}
 
 	/**
@@ -236,15 +214,7 @@ public class ArgumentMap {
 	 *   is no valid mapping
 	 */
 	public Integer getInteger(String flag) {
-		// TODO return getInteger(flag, null);
-		Integer output;
-		try {
-			output = Integer.parseInt(getString(flag));
-		}
-		catch(NumberFormatException e) {
-			output = null;
-		}
-		return output;
+		return getInteger(flag, null);
 	}
 
 	@Override
