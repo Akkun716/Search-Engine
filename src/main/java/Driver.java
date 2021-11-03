@@ -20,7 +20,8 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		// store initial start time
-		InvertedIndexBuilder builder = new InvertedIndexBuilder();
+		InvertedIndex index = new InvertedIndex();
+		InvertedIndexBuilder builder = new InvertedIndexBuilder(index);
 		Instant start = Instant.now();
 
 		ArgumentMap map = new ArgumentMap(args);
@@ -28,7 +29,7 @@ public class Driver {
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
 			try {
-				builder.readFiles(input);
+				builder.build(input);
 			}
 			catch(Exception e) {
 				if(input == null) {
@@ -43,7 +44,7 @@ public class Driver {
 		if(map.hasFlag("-query")) {
 			Path input = map.getPath("-query");
 			try {
-				builder.readFiles(input);
+				builder.build(input);
 			}
 			catch(Exception e) {
 				System.out.println("Unable to search from path: " + input.toString());
@@ -62,8 +63,6 @@ public class Driver {
 			 * Partial functionality
 			 */
 		}
-		
-		InvertedIndex index = builder.build();
 		
 		if(map.hasFlag("-counts")) {
 			Path output = map.getPath("-counts", Path.of("counts.json"));
