@@ -1,3 +1,4 @@
+import java.nio.file.Path;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -6,9 +7,19 @@ import java.util.TreeSet;
  */
 public class QueryResult implements Comparable<QueryResult>{
 	private final Set<String> results;
+	private Integer wordCount;
+	private Integer matchCount;
+	private Path location;
 	
-	public QueryResult() {
+	public QueryResult(Path location) {
 		results = new TreeSet<>();
+		this.location = location;
+		wordCount = 0;
+		matchCount = 0;
+	}
+	
+	public void query(String line) {
+		
 	}
 
 	@Override
