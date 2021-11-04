@@ -6,7 +6,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -85,11 +84,12 @@ public class TextStemmer {
 	 * @see listStems(String, Stemmer, output)
 	 */
 	public static void bufferedStem(Path input, Collection<String> output) throws IOException {
-		BufferedReader br = Files.newBufferedReader(input);
-		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-		String line;
-		while((line = br.readLine()) != null) {
-			stemLine(line, stemmer, output);
+		try(BufferedReader br = Files.newBufferedReader(input)) {
+			Stemmer stemmer = new SnowballStemmer(ENGLISH);
+			String line;
+			while((line = br.readLine()) != null) {
+				stemLine(line, stemmer, output);
+			}
 		}
 	}
 	
@@ -170,14 +170,15 @@ public class TextStemmer {
 	 * @see #uniqueStems(String, Stemmer)
 	 */
 	public static List<Set<String>> listUniqueStems(Path input) throws IOException {
-		ArrayList<Set<String>> output = new ArrayList<Set<String>>();
-		BufferedReader br = Files.newBufferedReader(input);
-		Stemmer stemmer = new SnowballStemmer(ENGLISH);
-		String line;
-		
-		while((line = br.readLine()) != null) {
-			output.add(uniqueStems(line, stemmer));
+		try(BufferedReader br = Files.newBufferedReader(input)) {
+			ArrayList<Set<String>> output = new ArrayList<Set<String>>();
+			Stemmer stemmer = new SnowballStemmer(ENGLISH);
+			String line;
+			
+			while((line = br.readLine()) != null) {
+				output.add(uniqueStems(line, stemmer));
+			}
+			return output;
 		}
-		return output;
 	}
 }

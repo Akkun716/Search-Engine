@@ -78,13 +78,14 @@ public class InvertedIndexBuilder {
 	 * @throws IOException file is invalid or can not be found
 	 */
 	public static void readFile(Path path, InvertedIndex invertedIndex) throws IOException {
-		BufferedReader br = Files.newBufferedReader(path);
-		Stemmer stemmer = new SnowballStemmer(TextStemmer.ENGLISH);
-		String line, pathString = path.toString();
-		int i = 1;
-		while((line = br.readLine()) != null) {
-			for(String word: TextParser.parse(line)) {
-				invertedIndex.add(stemmer.stem(word).toString(), pathString, i++);
+		try(BufferedReader br = Files.newBufferedReader(path)) {
+			Stemmer stemmer = new SnowballStemmer(TextStemmer.ENGLISH);
+			String line, pathString = path.toString();
+			int i = 1;
+			while((line = br.readLine()) != null) {
+				for(String word: TextParser.parse(line)) {
+					invertedIndex.add(stemmer.stem(word).toString(), pathString, i++);
+				}
 			}
 		}
 	}
