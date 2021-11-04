@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +34,7 @@ public class InvertedIndex {
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<>();
 		wordCount = new TreeMap<>();
-		queryResult = new QueryResult();
+		queryResult = null;
 	}
 
 	/**
@@ -92,6 +93,11 @@ public class InvertedIndex {
 		}
 		wordCount.put(location, count);
 		return true;
+	}
+	
+	public List<QueryResult> exactSearch() {
+		List<QueryResult> results = new ArrayList<>(); 
+		return Collections.emptyList();
 	}
 
 	/**
