@@ -20,12 +20,10 @@ public class Driver {
 	 */
 	public static void main(String[] args) {
 		// store initial start time
-
+		Instant start = Instant.now();
+		
 		InvertedIndex index = new InvertedIndex();
 		InvertedIndexBuilder builder = new InvertedIndexBuilder(index);
-
-		Instant start = Instant.now();
-
 		ArgumentMap map = new ArgumentMap(args);
 
 		if(map.hasFlag("-text")) {
@@ -42,11 +40,57 @@ public class Driver {
 				}
 			}
 		}
-
+		
+		if(map.hasFlag("-query")) {
+			Path input = map.getPath("-query");
+			try {
+				builder.build(input);
+			}
+			catch(Exception e) {
+				System.out.println("Unable to search from path: " + input.toString());
+			}
+		}
+		
+		if(map.hasFlag("-exact")) {
+			/**
+			 * TODO
+			 * Exact functionality
+			 */
+		}
+		else {
+			/**
+			 * TODO
+			 * Partial functionality
+			 */
+		}
+		
+		if(map.hasFlag("-counts")) {
+			Path output = map.getPath("-counts", Path.of("counts.json"));
+			try {
+				index.countToJson(output);
+			}
+			catch(Exception e) {
+				System.out.println("Unable to write out to file: " + output.toString());
+			}
+		}
+		
 		if(map.hasFlag("-index")) {
 			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
 				index.indexToJson(output);
+			}
+			catch(Exception e) {
+				System.out.println("Unable to write out to file: " + output.toString());
+			}
+		}
+		
+		if(map.hasFlag("-results")) {
+			Path output = map.getPath("-results", Path.of("results.json"));
+			try {
+				/*
+					TODO
+					index.resultToJson(output);
+				*/
 			}
 			catch(Exception e) {
 				System.out.println("Unable to write out to file: " + output.toString());

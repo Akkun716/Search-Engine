@@ -22,7 +22,9 @@ public class InvertedIndexBuilder {
 	private final InvertedIndex invertedIndex;
 
 	/**
-	 * Initializes empty invertedIndex
+	 * Passes an invertedIndex into the class to be alterable.
+	 * 
+	 * @param invertedIndex invertedIndex to be entered
 	 */
 	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
 		this.invertedIndex = invertedIndex;
@@ -49,7 +51,7 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * This checks to see if a path leads to a text file
+	 * This checks to see if a path leads to a text file.
 	 *
 	 * @param path file path to be checked
 	 * @return true if the path ends with the .txt or .text extension
@@ -60,7 +62,7 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * Reads the file path into the default invertedIndex map of the builder
+	 * Reads the file path into the default invertedIndex map of the builder.
 	 *
 	 * @param path file path to be read
 	 * @throws IOException file is invalid or can not be found
@@ -70,7 +72,7 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * Reads the file path into the specified invertedIndex
+	 * Reads the file path into the specified invertedIndex.
 	 *
 	 * @param path file path to be read
 	 * @param invertedIndex the index that will append the stemmed words from the
@@ -87,11 +89,12 @@ public class InvertedIndexBuilder {
 					invertedIndex.add(stemmer.stem(word).toString(), pathString, i++);
 				}
 			}
+			invertedIndex.addWordCount(pathString, i - 1);
 		}
 	}
 
 	/**
-	 * Outputs the built invertedIndex
+	 * Outputs the built invertedIndex.
 	 *
 	 * @return invertedIndex currently stored in builder
 	 */

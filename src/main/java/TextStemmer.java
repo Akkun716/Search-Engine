@@ -31,7 +31,7 @@ public class TextStemmer {
 
 	/**
 	 * This stems the words in a line and adds them to the collection object passed
-	 * in the function
+	 * in the function.
 	 * 
 	 * @param line line of text to be parsed and each word stemmed
 	 * @param stemmer Stemmer object instance which will clean and parse the line
