@@ -89,6 +89,7 @@ public class InvertedIndexBuilder {
 				invertedIndex.add(stemmer.stem(word).toString(), pathString, i++);
 			}
 		}
+		invertedIndex.addWordCount(pathString, i - 1);
 	}
 
 	/**
