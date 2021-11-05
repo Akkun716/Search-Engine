@@ -44,24 +44,31 @@ public class Driver {
 		if(map.hasFlag("-query")) {
 			Path input = map.getPath("-query");
 			try {
-				builder.build(input);
+				builder.buildQuery(input);
+				
+				if(map.hasFlag("-exact")) {
+					index.exactSearch(map.getPath("-text"));
+				}
+				else {
+					/**
+					 * TODO
+					 * Partial functionality
+					 */
+				}
+				
+				if(map.hasFlag("-results")) {
+					Path output = map.getPath("-results", Path.of("results.json"));
+					try {
+							index.resultToJson(output);
+					}
+					catch(Exception e) {
+						System.out.println("Unable to write out to file: " + output.toString());
+					}
+				}
 			}
 			catch(Exception e) {
 				System.out.println("Unable to search from path: " + input.toString());
 			}
-		}
-		
-		if(map.hasFlag("-exact")) {
-			/**
-			 * TODO
-			 * Exact functionality
-			 */
-		}
-		else {
-			/**
-			 * TODO
-			 * Partial functionality
-			 */
 		}
 		
 		if(map.hasFlag("-counts")) {
@@ -84,19 +91,6 @@ public class Driver {
 			}
 		}
 		
-		if(map.hasFlag("-results")) {
-			Path output = map.getPath("-results", Path.of("results.json"));
-			try {
-				/*
-					TODO
-					index.resultToJson(output);
-				*/
-			}
-			catch(Exception e) {
-				System.out.println("Unable to write out to file: " + output.toString());
-			}
-		}
-
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
 		double seconds = (double) elapsed.toMillis() / Duration.ofSeconds(1).toMillis();
