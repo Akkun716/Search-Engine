@@ -3,6 +3,10 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Set;
 
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
@@ -37,7 +41,7 @@ public class InvertedIndexBuilder {
 	 * @param mainPath path that points to file/dir to be processed
 	 * @throws IOException file is invalid or can not be found
 	 */
-	public void readFiles(Path mainPath) throws IOException{
+	public void readFiles(Path mainPath) throws IOException {
 		try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
 			for(Path path: stream) {
 				if(Files.isDirectory(path)) {
@@ -46,6 +50,20 @@ public class InvertedIndexBuilder {
 				else if(isTextFile(path)) {
 					readFile(path);
 				}
+			}
+		}
+	}
+	
+	public void readQueryFile(Path path) throws IOException {
+		readQueryFile(path, this.invertedIndex);
+	}
+	
+	public static void readQueryFile(Path path, InvertedIndex invertedIndex) throws IOException {
+		try(BufferedReader br = Files.newBufferedReader(path)) {
+			Stemmer stemmer = new SnowballStemmer(TextStemmer.ENGLISH);
+			String line;
+			while((line = br.readLine()) != null) {
+				invertedIndex.addQuery(TextStemmer.uniqueStems(line, stemmer));
 			}
 		}
 	}
@@ -98,13 +116,18 @@ public class InvertedIndexBuilder {
 	 *
 	 * @return invertedIndex currently stored in builder
 	 */
-	public void build(Path mainPath) throws IOException{
+	public void build(Path mainPath) throws IOException
+	{
 		if(Files.isDirectory(mainPath)) {
 			readFiles(mainPath);
 		}
 		else {
 			readFile(mainPath);
 		}
+	}
+	
+	public void buildQuery(Path mainPath) throws IOException {
+		readQueryFile(mainPath);
 	}
 
 }
