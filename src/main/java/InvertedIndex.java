@@ -1,6 +1,8 @@
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -18,15 +20,17 @@ public class InvertedIndex {
 	 * keys which are then paired to an array of positions in the file the word
 	 * stem appeared.
 	 */
-	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
+	private final Map<String, TreeMap<String, TreeSet<Object>>> invertedIndex;
 	
 	/**
 	 * This WordCount map holds the word count of the files included in the
 	 * invertedIndex map.
 	 */
-	private final Map<String, Integer> wordCount;
+	private final Map<String, Object> wordCount;
 	
-	private final QueryResult queryResult;
+	private final Map<String, List<QueryResult>> queryResult;
+	
+	private final List<Set<String>> queryList;
 	
 	/**
 	 * Initializes invertedIndex and wordCount to new empty TreeMap objects.
@@ -34,7 +38,8 @@ public class InvertedIndex {
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<>();
 		wordCount = new TreeMap<>();
-		queryResult = null;
+		queryResult = new TreeMap<>();
+		queryList = new ArrayList<>();
 	}
 
 	/**
@@ -48,7 +53,7 @@ public class InvertedIndex {
 	 */
 	public boolean add(String word, String location, Integer position) {
 		invertedIndex.putIfAbsent(word, new TreeMap<>());
-		invertedIndex.get(word).putIfAbsent(location, new TreeSet<Integer>());
+		invertedIndex.get(word).putIfAbsent(location, new TreeSet<Object>());
 		return invertedIndex.get(word).get(location).add(position);
 	}
 	
@@ -64,7 +69,6 @@ public class InvertedIndex {
 		for(String word: words) {
 			add(word, location, i++);
 		}
-		addWordCount(location, i - 1);
 	}
 	
 	/**
@@ -95,9 +99,33 @@ public class InvertedIndex {
 		return true;
 	}
 	
-	public List<QueryResult> exactSearch() {
-		List<QueryResult> results = new ArrayList<>(); 
-		return Collections.emptyList();
+	public boolean addQuery(Set<String> query) {
+		return query.isEmpty() || queryList.contains(query)
+				? false
+				: queryList.add(query);
+	}
+	
+	public void exactSearch(Path path) {
+		List<QueryResult> results;
+		var queryIterator = queryList.iterator();
+		int occurance = 0;
+		
+		while(queryIterator.hasNext()) {
+			results = new ArrayList<>();
+			var elem = queryIterator.next();
+			occurance = 0;
+			for(String stem: elem) {
+				if(hasStem(stem)) {
+					for(TreeSet<Object> entry: invertedIndex.get(stem).values()) {
+						occurance += entry.size();
+					}
+					
+					QueryResult newQuery = new QueryResult((Integer) wordCount.get(path.toString()), occurance, path.toString());
+					results.add(newQuery);
+				}
+			}
+			queryResult.put(String.join(" ", elem), results);
+		}
 	}
 
 	/**
@@ -129,7 +157,7 @@ public class InvertedIndex {
 	 * @param location file location that needs to be accessed
 	 * @return an unmodifiable Set of positions
 	 */
-	public Set<Integer> getPositions(String stem, String location) {
+	public Set<Object> getPositions(String stem, String location) {
 		return hasLocation(stem, location)
 				? Collections.unmodifiableSet(invertedIndex.get(stem).get(location))
 				: Collections.emptySet();
@@ -240,7 +268,27 @@ public class InvertedIndex {
 	 * @throws IOException file is invalid or can not be found
 	 */
 	public void resultToJson(Path output) throws IOException {
-//		TODO: output results to JSON
-//			JsonWriter.asObject(wordCount, output);
+			JsonWriter.asResult(queryResult, output);
 	}
+	
+//	public static void main(String[] args) {
+//		InvertedIndex index = new InvertedIndex();
+//		InvertedIndexBuilder builder = new InvertedIndexBuilder(index);
+//		try {
+//			Path searchPath = Path.of("/", "Users", "aanglon", "eclipse-workspace", "CS272", "Repositories", "project-tests", "input", "text", "simple", "animals.text");
+//			System.out.println(Files.exists(searchPath));
+//			builder.build(searchPath);
+//			Path path = Path.of("/", "Users", "aanglon", "eclipse-workspace", "CS272", "Repositories", "project-tests", "input", "query", "simple.txt");
+//			System.out.println(Files.exists(path));
+//			builder.buildQuery(path);
+//			
+//			for(QueryResult result: index.exactSearch(searchPath)) {
+//				System.out.println(result);
+//			}
+//		}
+//		catch(Exception e) {
+//			System.out.println("WHOOPTH!");
+//			e.printStackTrace();
+//		}
+//	}
 }
