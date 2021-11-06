@@ -54,6 +54,19 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
+	public void readQueryFiles(Path mainPath) throws IOException {
+		try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
+			for(Path path: stream) {
+				if(Files.isDirectory(path)) {
+					readQueryFiles(path);
+				}
+				else if(isTextFile(path)) {
+					readQueryFile(path);
+				}
+			}
+		}
+	}
+	
 	public void readQueryFile(Path path) throws IOException {
 		readQueryFile(path, this.invertedIndex);
 	}
@@ -127,7 +140,12 @@ public class InvertedIndexBuilder {
 	}
 	
 	public void buildQuery(Path mainPath) throws IOException {
-		readQueryFile(mainPath);
+		if(Files.isDirectory(mainPath)) {
+			readQueryFiles(mainPath);
+		}
+		else {
+			readQueryFile(mainPath);
+		}
 	}
 
 }
