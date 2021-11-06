@@ -1,3 +1,4 @@
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -29,7 +30,11 @@ public class Driver {
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
 			try {
+				System.out.println(Files.exists(input));
+				System.out.println("Filepath contains simple: " + input.toString().contains("simple"));
+				System.out.println(map);
 				builder.build(input);
+				System.out.println(index.wordCount.toString());
 			}
 			catch(Exception e) {
 				if(input == null) {
@@ -44,16 +49,15 @@ public class Driver {
 		if(map.hasFlag("-query")) {
 			Path input = map.getPath("-query");
 			try {
+				System.out.println(Files.exists(input));
 				builder.buildQuery(input);
+				System.out.println(index.queryResult);
 				
 				if(map.hasFlag("-exact")) {
-					index.exactSearch(map.getPath("-text"));
+					index.search(map.getPath("-text"), "exact");
 				}
 				else {
-					/**
-					 * TODO
-					 * Partial functionality
-					 */
+					index.search(map.getPath("-text"), "partial");
 				}
 				
 				if(map.hasFlag("-results")) {
@@ -68,6 +72,7 @@ public class Driver {
 			}
 			catch(Exception e) {
 				System.out.println("Unable to search from path: " + input.toString());
+				e.printStackTrace();
 			}
 		}
 		
