@@ -280,7 +280,7 @@ public class JsonWriter {
 		writer.write(",");
 		nextLine(writer, level);
 		keyFormat("score", writer);
-		writer.write(elem.getScore().toString());
+		writer.write(String.format("%.8f", elem.getScore()));
 		writer.write(",");
 		nextLine(writer, level);
 		keyFormat("where", writer);
