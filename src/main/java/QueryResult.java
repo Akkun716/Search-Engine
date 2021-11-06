@@ -13,14 +13,34 @@ import java.util.TreeSet;
 /**
  * This class holds the results from the query search. 
  */
-public class QueryResult implements Comparable<QueryResult>{
+public class QueryResult implements Comparable<QueryResult>{ 
 	private Integer matchCount;
+	private Integer wordCount;
 	private double score;
 	private String location;
 	
 	public QueryResult(int wordCount, int matchCount, String location) {
 		this.matchCount = matchCount;
-		score = matchCount / wordCount;
+		this.wordCount = wordCount;
+		score = ((double) matchCount) / wordCount;
+		this.location = location;
+	}
+	
+	public void combine(QueryResult result) {
+		matchCount += (Integer) result.getMatchCount(); 
+		score = (double) matchCount / wordCount;
+	}
+	
+	public void setMatchCount(int matchCount) {
+		this.matchCount = matchCount;
+		setScore(this.matchCount / wordCount);
+	}
+	
+	public void setScore(double score) {
+		this.score = score;
+	}
+	
+	public void setLocation(String location) {
 		this.location = location;
 	}
 	
@@ -32,14 +52,22 @@ public class QueryResult implements Comparable<QueryResult>{
 		return score;
 	}
 	
+	public String getScoreString() {
+		return String.format("%.8f", score);
+	}
+	
 	public Object getLocation() {
 		return location;
 	}
 
 	@Override
 	public int compareTo(QueryResult o) {
-		// TODO Auto-generated method stub
-		return 0;
+		int output = Double.compare((double) o.getScore(), score); 
+		return  output != 0
+				? output
+				: (output = Integer.compare((Integer) o.getMatchCount(), matchCount)) != 0
+					? output
+					: location.compareToIgnoreCase(o.getLocation().toString());
 	}
 	
 	@Override
@@ -54,8 +82,4 @@ public class QueryResult implements Comparable<QueryResult>{
 		builder.append("]");
 		return builder.toString();
 	}
-	
-	
-	
-	
 }
