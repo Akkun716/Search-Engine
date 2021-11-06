@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -26,10 +27,16 @@ public class InvertedIndex {
 	 * This WordCount map holds the word count of the files included in the
 	 * invertedIndex map.
 	 */
-	private final Map<String, Object> wordCount;
+	public final Map<String, Object> wordCount;
 	
-	private final Map<String, List<QueryResult>> queryResult;
+	/**
+	 * This QueryResult map holds lists of queryResults for each query line key
+	 */
+	public final Map<String, List<QueryResult>> queryResult;
 	
+	/**
+	 * This List hold query line sets for future searching
+	 */
 	private final List<Set<String>> queryList;
 	
 	/**
@@ -99,31 +106,92 @@ public class InvertedIndex {
 		return true;
 	}
 	
+	/**
+	 * Adds a single query line to queryList
+	 * 
+	 * @param query multi stem query represented as a Set
+	 * @return true if the set is updated with the query
+	 */
 	public boolean addQuery(Set<String> query) {
 		return query.isEmpty() || queryList.contains(query)
 				? false
 				: queryList.add(query);
 	}
 	
-	public void exactSearch(Path path) {
-		List<QueryResult> results;
+	/**
+	 * Searches through the inverted index for exact occurrences of  
+	 */
+	public void search(Path path, String searchType) {
+		List<QueryResult> results = null;
+		QueryResult newQuery = null;
 		var queryIterator = queryList.iterator();
-		int occurance = 0;
+		int occurrence = 0;
 		
-		while(queryIterator.hasNext()) {
-			results = new ArrayList<>();
-			var elem = queryIterator.next();
-			occurance = 0;
-			for(String stem: elem) {
-				if(hasStem(stem)) {
-					for(TreeSet<Object> entry: invertedIndex.get(stem).values()) {
-						occurance += entry.size();
-					}
-					
-					QueryResult newQuery = new QueryResult((Integer) wordCount.get(path.toString()), occurance, path.toString());
-					results.add(newQuery);
+		if(searchType.equals("exact")) {
+			exactSearch(queryIterator, occurrence, newQuery, results);
+		}
+		else {
+			partialSearch(queryIterator, occurrence, newQuery, results);
+		}
+	}
+	
+	public void cleanSortResults(List<QueryResult> results) {
+		QuickSort.sort(results);
+		for(int elemIndex = 0; elemIndex < results.size() - 1; elemIndex++) {
+			for(int elemCheck = elemIndex + 1; elemCheck < results.size(); elemCheck++) {
+				if(results.get(elemIndex).getLocation().equals(results.get(elemCheck).getLocation())) {
+					results.get(elemIndex).combine(results.get(elemCheck));
+					results.remove(elemCheck);
+					elemCheck--;
 				}
 			}
+		}
+	}
+	
+	public void exactSearch(Iterator<Set<String>> queryIterator, int occurrence, QueryResult newQuery, List<QueryResult> results) {
+		//While there are queries in list
+		while(queryIterator.hasNext()) {
+			results = new ArrayList<>();
+			//Retrieved query
+			var elem = queryIterator.next();
+			//For every stem in query
+			for(String stem: elem) {
+				//If the index has the query stem
+				if(hasStem(stem)) {
+					//For every entry under that stem
+					for(String fileLocation: getLocations(stem)) {
+						occurrence = invertedIndex.get(stem).get(fileLocation).size();
+						newQuery = new QueryResult((Integer) wordCount.get(fileLocation), occurrence, fileLocation);
+						results.add(newQuery);
+					}
+				}
+			}
+			cleanSortResults(results);
+			queryResult.put(String.join(" ", elem), results);
+		}
+	}
+	
+	public void partialSearch(Iterator<Set<String>> queryIterator, int occurrence, QueryResult newQuery, List<QueryResult> results) {
+//		Set<String> stemKeys = invertedIndex.keySet();
+		//While there are queries in list
+		while(queryIterator.hasNext()) {
+			results = new ArrayList<>();
+			//Retrieved query
+			var elem = queryIterator.next();		
+			//For every stem in query
+			for(String stem: elem) {
+				//For every entry under that stem
+				for(String stemKey: invertedIndex.keySet()) {
+					if(stemKey.startsWith(stem)) {
+						for(String fileLocation: getLocations(stemKey)) {
+							occurrence = invertedIndex.get(stemKey).get(fileLocation).size();
+							newQuery = new QueryResult((Integer) wordCount.get(fileLocation), occurrence, fileLocation);
+							results.add(newQuery);
+						}
+					}
+				}
+			}
+			cleanSortResults(results);
 			queryResult.put(String.join(" ", elem), results);
 		}
 	}
@@ -270,25 +338,4 @@ public class InvertedIndex {
 	public void resultToJson(Path output) throws IOException {
 			JsonWriter.asResult(queryResult, output);
 	}
-	
-//	public static void main(String[] args) {
-//		InvertedIndex index = new InvertedIndex();
-//		InvertedIndexBuilder builder = new InvertedIndexBuilder(index);
-//		try {
-//			Path searchPath = Path.of("/", "Users", "aanglon", "eclipse-workspace", "CS272", "Repositories", "project-tests", "input", "text", "simple", "animals.text");
-//			System.out.println(Files.exists(searchPath));
-//			builder.build(searchPath);
-//			Path path = Path.of("/", "Users", "aanglon", "eclipse-workspace", "CS272", "Repositories", "project-tests", "input", "query", "simple.txt");
-//			System.out.println(Files.exists(path));
-//			builder.buildQuery(path);
-//			
-//			for(QueryResult result: index.exactSearch(searchPath)) {
-//				System.out.println(result);
-//			}
-//		}
-//		catch(Exception e) {
-//			System.out.println("WHOOPTH!");
-//			e.printStackTrace();
-//		}
-//	}
 }
