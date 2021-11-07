@@ -130,6 +130,7 @@ public class TextStemmer {
 	 *
 	 * @param line the line of words to parse and stem
 	 * @return a sorted set of unique cleaned and stemmed words
+	 * @throws IOException if unable to read or parse file
 	 *
 	 * @see SnowballStemmer
 	 * @see #ENGLISH

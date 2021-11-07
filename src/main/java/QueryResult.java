@@ -19,6 +19,13 @@ public class QueryResult implements Comparable<QueryResult>{
 	 */
 	private String location;
 	
+	/**
+	 * Initializes instance data and calculates score.
+	 * 
+	 * @param wordCount total count of words from location
+	 * @param matchCount amount of stem matches from query
+	 * @param location file location searched
+	 */
 	public QueryResult(int wordCount, int matchCount, String location) {
 		this.matchCount = matchCount;
 		this.wordCount = wordCount;

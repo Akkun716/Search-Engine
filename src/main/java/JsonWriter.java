@@ -28,6 +28,7 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 * 
 	 * @see writeEntry(String, Writer, int)
+	 * @see nextLine(Writer, int)
 	 */
 	public static void asArray(Collection<Object> elements, Writer writer,
 			int level) throws IOException {
@@ -50,18 +51,26 @@ public class JsonWriter {
 	}
 
 	/**
-	 * Outputs array element to writer with JSON level formatting
+	 * Outputs array element to writer with JSON level formatting.
+	 * 
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
-	 * 
 	 * @throws IOException if an IO error occurs
+	 * 
+	 * @see nextLine(Writer, int)
 	 */
 	public static void writeEntry(String elem, Writer writer, int level) throws IOException{
 		nextLine(writer, level);
 		writer.write(elem);
 	}
 	
+	/**
+	 * Adds new line and indent level to input writer.
+	 * 
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 */
 	public static void nextLine(Writer writer, int level) throws IOException {
 		writer.write("\n");
 		writer.write("\t".repeat(level));
@@ -75,7 +84,8 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see writerKeyValueEntry(Map.Entry, Writer, int)
+	 * @see writeKeyValueEntry(Map.Entry, Writer, int)
+	 * @see nextLine(Writer, int)
 	 */
 	public static void asObject(Map<String, Object> elements, Writer writer,
 			int level) throws IOException {
@@ -98,38 +108,57 @@ public class JsonWriter {
 	}
 	
 	/**
-	 * Outputs object element to writer with JSON level formatting
+	 * Outputs object element to writer with JSON level formatting.
 	 * 
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
+	 * @see nextLine(Writer, int)
 	 * @see keyFormat(String, Writer)
 	 */
 	public static void writeKeyValueEntry(Map.Entry<String, Object> elem,
 			Writer writer, int level) throws IOException{
-		nextLine(writer, level);
-		keyFormat(elem.getKey(), writer);
+		keyFormat(elem.getKey(), writer, level);
 		writer.write(elem.getValue().toString());
 	}
 
 	/**
-	 * Constructs JSON object key formatting by placing quotes ("") around key and colon (:) after
+	 * Constructs JSON object key formatting by placing quotes ("") around key and
+	 * colon (:) after.
+	 * @param key the Map key for JSON key formatting
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 *
+	 * @throws IOException if an IO error occurs
+	 * 
+	 * @see quoteEnclose(String, Writer)
+	 * @see @see nextLine(Writer, int)
+	 */
+	private static void keyFormat(String key, Writer writer, int level) throws IOException{
+		nextLine(writer, level);
+		quoteEnclose(key, writer);
+		writer.write(": ");
+	}
+	
+	/**
+	 * Places quotes around an input String.
 	 *
 	 * @param writer the writer to use
 	 * @param key the Map key for JSON key formatting
 	 * @throws IOException if an IO error occurs
 	 */
-	private static void keyFormat(String key, Writer writer) throws IOException{
-		quoteEnclose(key, writer);
-		writer.write(": ");
+	private static void quoteEnclose(String elem, Writer writer) throws IOException {
+		writer.write("\"");
+		writer.write(elem);
+		writer.write("\"");
 	}
 
 	/**
 	 * Writes the elements as a pretty JSON object with nested arrays. The generic
 	 * notation used allows this method to be used for any type of map with any type
-	 * of nested collection of integer objects.
+	 * of nested collection of Object.
 	 *
 	 * @param elements the elements to write
 	 * @param writer the writer to use
@@ -137,6 +166,7 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 * 
 	 * @see writeKVArrayEntry(Map.Entry, Wrtier, int)
+	 * @see nextLine(Writer, int)
 	 */
 	public static void asNestedArray(Map<String, ? extends Collection<Object>> elements,
 			Writer writer, int level) throws IOException {
@@ -160,34 +190,35 @@ public class JsonWriter {
 	
 	
 	/**
-	 * Outputs nested array element to writer with JSON level formatting
+	 * Outputs nested array element to writer with JSON level formatting.
 	 * 
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
+	 * @see nextLine(Writer, int)
 	 * @see keyFormat(String, Writer)
 	 * @see asArray(Collection, Writer, int)
 	 */
 	public static void writeKVArrayEntry(Map.Entry<String, ? extends Collection<Object>> elem,
 			Writer writer, int level) throws IOException{
-		nextLine(writer, level);
-		keyFormat(elem.getKey(), writer);
+		keyFormat(elem.getKey(), writer, level);
 		asArray(elem.getValue(), writer, level);
 	}
 
 	/**
 	 * Writes the elements as a pretty JSON object with nested objects with nested arrays.
 	 * The generic notation used allows this method to be used for any type of map with any
-	 * nested map with any collection of integer objects.
+	 * nested map with any collection of Object.
 	 *
 	 * @param elements the elements to write
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see writerKVObjectEntry(Map.Entry, Writer, int)
+	 * @see writeKVObjectEntry(Map.Entry, Writer, int)
+	 * @see nextLine(Writer, int)
 	 */
 	public static void asNestedObject(Map<String, ? extends Map<String, ? extends Collection<Object>>> elements,
 			Writer writer, int level) throws IOException {
@@ -210,23 +241,36 @@ public class JsonWriter {
 	}
 	
 	/**
-	 * Outputs nested object element to writer with JSON level formatting
+	 * Outputs nested object element to writer with JSON level formatting.
 	 * 
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
+	 * @see nextLine(Writer, int)
 	 * @see keyFormat(String, Writer)
 	 * @see asNestedArray(Map, Writer, int)
 	 */
 	public static void writeKVObjectEntry(Map.Entry<String, ? extends Map<String, ? extends Collection<Object>>> elem,
 			Writer writer, int level) throws IOException{
-		nextLine(writer, level);
-		keyFormat(elem.getKey(), writer);
+		keyFormat(elem.getKey(), writer, level);
 		asNestedArray(elem.getValue(), writer, level);
 	}
 	
+	/**
+	 * Writes the elements as a pretty JSON query result with nested arrays. The
+	 * generic notation used allows this method to be used for any type of map with
+	 * any collection of QueryResult.
+	 *
+	 * @param elements the elements to write
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
+	 * 
+	 * @see writeResultEntry(Map.Entry, Writer, int)
+	 * @see nextLine(Writer, int)
+	 */
 	public static void asResult(Map<String, ? extends Collection<QueryResult>> elements, Writer writer, int level) throws IOException {
 		writer.write("{");
 		level++;
@@ -246,12 +290,32 @@ public class JsonWriter {
 		writer.write("}");
 	}
 	
+	/**
+	 * Outputs result element to writer with JSON level formatting.
+	 * 
+	 * @param elem the element to be written in
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
+	 * 
+	 * @see nextLine(Writer, int)
+	 */
 	public static void writeResultEntry(Map.Entry<String, ? extends Collection<QueryResult>> elem, Writer writer, int level) throws IOException {
-		nextLine(writer, level);
-		keyFormat(elem.getKey(), writer);
+		keyFormat(elem.getKey(), writer, level);
 		asQueryArray(elem.getValue(), writer, level);
 	}
 	
+	/**
+	 * Writes the elements as a pretty JSON queryResult arrays. The generic notation
+	 * used allows this method to be used for any collection of QueryResult.
+	 * 
+	 * @param elements the elements to write
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
+	 * 
+	 * @see nextLine(Writer, int)
+	 */
 	public static void asQueryArray(Collection<QueryResult> elements, Writer writer, int level) throws IOException {
 		writer.write("[");
 		level++;
@@ -271,31 +335,28 @@ public class JsonWriter {
 		writer.write("]");
 	}
 	
+	/**
+	 * Outputs query element to writer with JSON level formating.
+	 * 
+	 * @see nextLine(Writer, int)
+	 * @see keyFormat(String, Writer)
+	 * @see quoteEnclose(String, Writer)
+	 */
 	public static void writeQueryEntry(QueryResult elem, Writer writer, int level) throws IOException {
 		nextLine(writer, level);
 		writer.write("{");
-		nextLine(writer, ++level);
-		keyFormat("count", writer);
+		keyFormat("count", writer, ++level);
 		writer.write(elem.getMatchCount().toString());
 		writer.write(",");
-		nextLine(writer, level);
-		keyFormat("score", writer);
+		keyFormat("score", writer, level);
 		writer.write(String.format("%.8f", elem.getScore()));
 		writer.write(",");
-		nextLine(writer, level);
-		keyFormat("where", writer);
+		keyFormat("where", writer, level);
 		quoteEnclose(elem.getLocation().toString(), writer);
 		nextLine(writer, --level);
 		writer.write("}");
 		
 	}
-	
-	private static void quoteEnclose(String elem, Writer writer) throws IOException {
-		writer.write("\"");
-		writer.write(elem);
-		writer.write("\"");
-	}
-
 
 	/**
 	 * Writes the elements as a pretty JSON array to file.
@@ -359,6 +420,15 @@ public class JsonWriter {
 		}
 	}
 	
+	/**
+	 * Writes the elements as a pretty JSON query result with nested objects to file.
+	 * 
+	 * @param elements the elements to write
+	 * @param path the file path to use
+	 * @throws IOException if an IO error occurs
+	 *
+	 * @see #asResult(Map, Writer, int)
+	 */
 	public static void asResult(Map<String, ? extends Collection<QueryResult>> elements,
 			Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {

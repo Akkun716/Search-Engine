@@ -41,6 +41,7 @@ public class QuickSort
 	 * @param results list to be sorted
 	 * @param left left edge index
 	 * @param right right edge index
+	 * @return index of pivot
 	 */
     private static int partition(List<QueryResult> results, int left, int right) {
         QueryResult pivot = results.get(right);
