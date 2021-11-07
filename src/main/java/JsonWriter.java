@@ -70,6 +70,7 @@ public class JsonWriter {
 	 * 
 	 * @param writer the writer to use
 	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
 	 */
 	public static void nextLine(Writer writer, int level) throws IOException {
 		writer.write("\n");
@@ -145,8 +146,8 @@ public class JsonWriter {
 	/**
 	 * Places quotes around an input String.
 	 *
+	 * @param elem the element to be written in
 	 * @param writer the writer to use
-	 * @param key the Map key for JSON key formatting
 	 * @throws IOException if an IO error occurs
 	 */
 	private static void quoteEnclose(String elem, Writer writer) throws IOException {
@@ -337,6 +338,11 @@ public class JsonWriter {
 	
 	/**
 	 * Outputs query element to writer with JSON level formating.
+	 * 
+	 * @param elem the element to be written in
+	 * @param writer the writer to use
+	 * @param level the initial indent level
+	 * @throws IOException if an IO error occurs
 	 * 
 	 * @see nextLine(Writer, int)
 	 * @see keyFormat(String, Writer)

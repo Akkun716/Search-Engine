@@ -74,10 +74,11 @@ public class TextStemmer {
 
 	/**
 	 * Rather than just a single line (like in listStem), a file is read through
-	 * via BufferedReader and listStem is called on each line
+	 * via BufferedReader and listStem is called on each line.
 	 * 
 	 * @param input the file path to be parsed each word stemmed
 	 * @param output the Collection object each stemmed word will be added to
+	 * @throws IOException if unable to read or parse file
 	 * 
 	 * @see SnowballStemmer
 	 * @see #ENGLISH
