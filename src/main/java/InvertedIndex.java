@@ -1,8 +1,6 @@
 import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -30,12 +28,12 @@ public class InvertedIndex {
 	public final Map<String, Object> wordCount;
 	
 	/**
-	 * This QueryResult map holds lists of queryResults for each query line key
+	 * This QueryResult map holds lists of queryResults for each query line key.
 	 */
 	public final Map<String, List<QueryResult>> queryResult;
 	
 	/**
-	 * This List hold query line sets for future searching
+	 * This List hold query line sets for future searching.
 	 */
 	private final List<Set<String>> queryList;
 	
@@ -107,7 +105,7 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * Adds a single query line to queryList
+	 * Adds a single query line to queryList.
 	 * 
 	 * @param query multi stem query represented as a Set
 	 * @return true if the set is updated with the query
@@ -119,36 +117,49 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * Searches through the inverted index for exact occurrences of  
+	 * Searches through the inverted index for stems that match (exact or partial)
+	 * the stems in queries.
+	 * 
+	 * @param exact represents if exact search should be executed
 	 */
-	public void search(Path path, String searchType) {
-		List<QueryResult> results = null;
-		QueryResult newQuery = null;
+	public void search(boolean exact) {
 		var queryIterator = queryList.iterator();
-		int occurrence = 0;
 		
-		if(searchType.equals("exact")) {
-			exactSearch(queryIterator, occurrence, newQuery, results);
+		if(exact) {
+			exactSearch(queryIterator);
 		}
 		else {
-			partialSearch(queryIterator, occurrence, newQuery, results);
+			partialSearch(queryIterator);
 		}
 	}
 	
+	/**
+	 * Joins the queryResults of same stem and location, then sorts the list.
+	 * 
+	 * @param results list of queryResults to be cleaned and sorted
+	 */
 	public void cleanSortResults(List<QueryResult> results) {
 		for(int elemIndex = 0; elemIndex < results.size() - 1; elemIndex++) {
-			for(int elemCheck = elemIndex + 1; elemCheck < results.size(); elemCheck++) {
-				if(results.get(elemIndex).getLocation().equals(results.get(elemCheck).getLocation())) {
-					results.get(elemIndex).combine(results.get(elemCheck));
-					results.remove(elemCheck);
-					elemCheck--;
+			for(int nextElem = elemIndex + 1; nextElem < results.size(); nextElem++) {
+				if(results.get(elemIndex).getLocation().equals(results.get(nextElem).getLocation())) {
+					results.get(elemIndex).combine(results.get(nextElem));
+					results.remove(nextElem);
+					nextElem--;
 				}
 			}
 		}
 		QuickSort.sort(results);
 	}
 	
-	public void exactSearch(Iterator<Set<String>> queryIterator, int occurrence, QueryResult newQuery, List<QueryResult> results) {
+	/**
+	 * Searches through the invertedIndex to fond exact matches to the query stems.
+	 * 
+	 * @param queryIterator iterator of the queryList (list of stems from query)
+	 */
+	public void exactSearch(Iterator<Set<String>> queryIterator) {
+		List<QueryResult> results;
+		QueryResult newQuery;
+		int occurrence = 0;
 		//While there are queries in list
 		while(queryIterator.hasNext()) {
 			results = new ArrayList<>();
@@ -171,8 +182,16 @@ public class InvertedIndex {
 		}
 	}
 	
-	public void partialSearch(Iterator<Set<String>> queryIterator, int occurrence, QueryResult newQuery, List<QueryResult> results) {
-//		Set<String> stemKeys = invertedIndex.keySet();
+	/**
+	 * Searches through the invertedIndex to find matches that start with the query
+	 * stems.
+	 * 
+	 * @param queryIterator iterator of the queryList (list of stems from query)
+	 */
+	public void partialSearch(Iterator<Set<String>> queryIterator) {
+		List<QueryResult> results;
+		QueryResult newQuery;
+		int occurrence = 0;
 		//While there are queries in list
 		while(queryIterator.hasNext()) {
 			results = new ArrayList<>();
