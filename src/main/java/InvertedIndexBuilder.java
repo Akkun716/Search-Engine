@@ -3,10 +3,6 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Set;
 
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
@@ -54,6 +50,13 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
+	/**
+	 * Takes in a Path object and uses TextStemmer to parse through the text file(s)
+	 * indicated by the Path and adds them to the invertedIndex HashMap.
+	 *
+	 * @param mainPath path that points to file/dir to be processed
+	 * @throws IOException file is invalid or can not be found
+	 */
 	public void readQueryFiles(Path mainPath) throws IOException {
 		try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
 			for(Path path: stream) {
@@ -67,10 +70,25 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
+	/**
+	 * Reads the file path into the default invertedIndex map's queryList of the
+	 * builder.
+	 *
+	 * @param path file path to be read
+	 * @throws IOException file is invalid or can not be found
+	 */
 	public void readQueryFile(Path path) throws IOException {
 		readQueryFile(path, this.invertedIndex);
 	}
 	
+	/**
+	 * Reads the file path into the specified invertedIndex's queryList.
+	 *
+	 * @param path file path to be read
+	 * @param invertedIndex the index that will append the stemmed words from the
+	 * 	file
+	 * @throws IOException file is invalid or can not be found
+	 */
 	public static void readQueryFile(Path path, InvertedIndex invertedIndex) throws IOException {
 		try(BufferedReader br = Files.newBufferedReader(path)) {
 			Stemmer stemmer = new SnowballStemmer(TextStemmer.ENGLISH);
@@ -125,9 +143,10 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * Outputs the built invertedIndex.
-	 *
-	 * @return invertedIndex currently stored in builder
+	 * Populates invertedIndex from mainPath.
+	 * 
+	 * @param mainPath file location to be read
+	 * @throws IOException file is invalid or can not be found
 	 */
 	public void build(Path mainPath) throws IOException
 	{
@@ -139,6 +158,12 @@ public class InvertedIndexBuilder {
 		}
 	}
 	
+	/**
+	 * Populates queryList in invertedInverted from mainPath.
+	 * 
+	 * @param mainPath file location to be read
+	 * @throws IOException file is invalid or can not be found
+	 */
 	public void buildQuery(Path mainPath) throws IOException {
 		if(Files.isDirectory(mainPath)) {
 			readQueryFiles(mainPath);
