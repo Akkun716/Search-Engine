@@ -30,11 +30,7 @@ public class Driver {
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
 			try {
-				System.out.println(Files.exists(input));
-				System.out.println("Filepath contains simple: " + input.toString().contains("simple"));
-				System.out.println(map);
 				builder.build(input);
-				System.out.println(index.wordCount.toString());
 			}
 			catch(Exception e) {
 				if(input == null) {
@@ -46,11 +42,13 @@ public class Driver {
 			}
 		}
 		
-		if(map.hasFlag("-query")) {
+		if(map.hasFlag("-query") && map.getPath("-query") != null) {
 			Path input = map.getPath("-query");
 			try {
 				System.out.println(Files.exists(input));
-				builder.buildQuery(input);
+				if(Files.exists(input)) {
+					builder.buildQuery(input);
+				}
 				System.out.println(index.queryResult);
 				
 				if(map.hasFlag("-exact")) {
@@ -59,20 +57,20 @@ public class Driver {
 				else {
 					index.search(map.getPath("-text"), "partial");
 				}
-				
-				if(map.hasFlag("-results")) {
-					Path output = map.getPath("-results", Path.of("results.json"));
-					try {
-							index.resultToJson(output);
-					}
-					catch(Exception e) {
-						System.out.println("Unable to write out to file: " + output.toString());
-					}
-				}
 			}
 			catch(Exception e) {
 				System.out.println("Unable to search from path: " + input.toString());
 				e.printStackTrace();
+			}
+		}
+		
+		if(map.hasFlag("-results")) {
+			Path output = map.getPath("-results", Path.of("results.json"));
+			try {
+					index.resultToJson(output);
+			}
+			catch(Exception e) {
+				System.out.println("Unable to write out to file: " + output.toString());
 			}
 		}
 		
