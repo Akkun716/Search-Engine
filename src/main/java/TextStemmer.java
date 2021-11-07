@@ -82,7 +82,7 @@ public class TextStemmer {
 	 * 
 	 * @see SnowballStemmer
 	 * @see #ENGLISH
-	 * @see listStems(String, Stemmer, output)
+	 * @see stemLine(String, Stemmer, Collection)
 	 */
 	public static void bufferedStem(Path input, Collection<String> output) throws IOException {
 		try(BufferedReader br = Files.newBufferedReader(input)) {
@@ -131,7 +131,6 @@ public class TextStemmer {
 	 *
 	 * @param line the line of words to parse and stem
 	 * @return a sorted set of unique cleaned and stemmed words
-	 * @throws IOException if unable to read or parse file
 	 *
 	 * @see SnowballStemmer
 	 * @see #ENGLISH

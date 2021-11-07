@@ -117,7 +117,7 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 * 
 	 * @see nextLine(Writer, int)
-	 * @see keyFormat(String, Writer)
+	 * @see keyFormat(String, Writer, int)
 	 */
 	public static void writeKeyValueEntry(Map.Entry<String, Object> elem,
 			Writer writer, int level) throws IOException{
@@ -135,7 +135,7 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 * 
 	 * @see quoteEnclose(String, Writer)
-	 * @see @see nextLine(Writer, int)
+	 * @see nextLine(Writer, int)
 	 */
 	private static void keyFormat(String key, Writer writer, int level) throws IOException{
 		nextLine(writer, level);
@@ -199,7 +199,7 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 * 
 	 * @see nextLine(Writer, int)
-	 * @see keyFormat(String, Writer)
+	 * @see keyFormat(String, Writer, int)
 	 * @see asArray(Collection, Writer, int)
 	 */
 	public static void writeKVArrayEntry(Map.Entry<String, ? extends Collection<Object>> elem,
@@ -250,7 +250,7 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 * 
 	 * @see nextLine(Writer, int)
-	 * @see keyFormat(String, Writer)
+	 * @see keyFormat(String, Writer, int)
 	 * @see asNestedArray(Map, Writer, int)
 	 */
 	public static void writeKVObjectEntry(Map.Entry<String, ? extends Map<String, ? extends Collection<Object>>> elem,
@@ -315,6 +315,7 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
+	 * @see writeQueryEntry(QueryResult, Writer, int)
 	 * @see nextLine(Writer, int)
 	 */
 	public static void asQueryArray(Collection<QueryResult> elements, Writer writer, int level) throws IOException {
@@ -345,7 +346,7 @@ public class JsonWriter {
 	 * @throws IOException if an IO error occurs
 	 * 
 	 * @see nextLine(Writer, int)
-	 * @see keyFormat(String, Writer)
+	 * @see keyFormat(String, Writer, int)
 	 * @see quoteEnclose(String, Writer)
 	 */
 	public static void writeQueryEntry(QueryResult elem, Writer writer, int level) throws IOException {
