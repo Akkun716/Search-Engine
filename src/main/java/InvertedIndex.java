@@ -136,7 +136,6 @@ public class InvertedIndex {
 	}
 	
 	public void cleanSortResults(List<QueryResult> results) {
-		QuickSort.sort(results);
 		for(int elemIndex = 0; elemIndex < results.size() - 1; elemIndex++) {
 			for(int elemCheck = elemIndex + 1; elemCheck < results.size(); elemCheck++) {
 				if(results.get(elemIndex).getLocation().equals(results.get(elemCheck).getLocation())) {
@@ -146,6 +145,7 @@ public class InvertedIndex {
 				}
 			}
 		}
+		QuickSort.sort(results);
 	}
 	
 	public void exactSearch(Iterator<Set<String>> queryIterator, int occurrence, QueryResult newQuery, List<QueryResult> results) {
