@@ -45,17 +45,15 @@ public class Driver {
 		if(map.hasFlag("-query") && map.getPath("-query") != null) {
 			Path input = map.getPath("-query");
 			try {
-				System.out.println(Files.exists(input));
 				if(Files.exists(input)) {
 					builder.buildQuery(input);
 				}
-				System.out.println(index.queryResult);
 				
 				if(map.hasFlag("-exact")) {
-					index.search(map.getPath("-text"), "exact");
+					index.search(true);
 				}
 				else {
-					index.search(map.getPath("-text"), "partial");
+					index.search(false);
 				}
 			}
 			catch(Exception e) {
