@@ -22,7 +22,7 @@ public class Driver {
 	public static void main(String[] args) {
 		// store initial start time
 		Instant start = Instant.now();
-		
+
 		InvertedIndex index = new InvertedIndex();
 		InvertedIndexBuilder builder = new InvertedIndexBuilder(index);
 		ArgumentMap map = new ArgumentMap(args);
@@ -41,14 +41,14 @@ public class Driver {
 				}
 			}
 		}
-		
+
 		if(map.hasFlag("-query") && map.getPath("-query") != null) {
 			Path input = map.getPath("-query");
 			try {
 				if(Files.exists(input)) {
 					builder.buildQuery(input);
 				}
-				
+
 				if(map.hasFlag("-exact")) {
 					index.search(true);
 				}
@@ -58,10 +58,10 @@ public class Driver {
 			}
 			catch(Exception e) {
 				System.out.println("Unable to search from path: " + input.toString());
-				e.printStackTrace();
+				e.printStackTrace(); // TODO Fix
 			}
 		}
-		
+
 		if(map.hasFlag("-results")) {
 			Path output = map.getPath("-results", Path.of("results.json"));
 			try {
@@ -71,7 +71,7 @@ public class Driver {
 				System.out.println("Unable to write out to file: " + output.toString());
 			}
 		}
-		
+
 		if(map.hasFlag("-counts")) {
 			Path output = map.getPath("-counts", Path.of("counts.json"));
 			try {
@@ -81,7 +81,7 @@ public class Driver {
 				System.out.println("Unable to write out to file: " + output.toString());
 			}
 		}
-		
+
 		if(map.hasFlag("-index")) {
 			Path output = map.getPath("-index", Path.of("index.json"));
 			try {
@@ -91,7 +91,7 @@ public class Driver {
 				System.out.println("Unable to write out to file: " + output.toString());
 			}
 		}
-		
+
 		// calculate time elapsed and output
 		Duration elapsed = Duration.between(start, Instant.now());
 		double seconds = (double) elapsed.toMillis() / Duration.ofSeconds(1).toMillis();

@@ -23,7 +23,7 @@ public class InvertedIndexBuilder {
 
 	/**
 	 * Passes an invertedIndex into the class to be alterable.
-	 * 
+	 *
 	 * @param invertedIndex invertedIndex to be entered
 	 */
 	public InvertedIndexBuilder(InvertedIndex invertedIndex) {
@@ -49,7 +49,7 @@ public class InvertedIndexBuilder {
 			}
 		}
 	}
-	
+
 	/**
 	 * Takes in a Path object and uses TextStemmer to parse through the text file(s)
 	 * indicated by the Path and adds them to the invertedIndex HashMap.
@@ -69,7 +69,7 @@ public class InvertedIndexBuilder {
 			}
 		}
 	}
-	
+
 	/**
 	 * Reads the file path into the default invertedIndex map's queryList of the
 	 * builder.
@@ -80,7 +80,7 @@ public class InvertedIndexBuilder {
 	public void readQueryFile(Path path) throws IOException {
 		readQueryFile(path, this.invertedIndex);
 	}
-	
+
 	/**
 	 * Reads the file path into the specified invertedIndex's queryList.
 	 *
@@ -106,6 +106,7 @@ public class InvertedIndexBuilder {
 	 * @return true if the path ends with the .txt or .text extension
 	 */
 	public static boolean isTextFile(Path path) {
+		// TODO String lower = path.toString().toLowerCase();
 		return path.toString().toLowerCase().endsWith(".txt") ||
 				path.toString().toLowerCase().endsWith(".text");
 	}
@@ -138,13 +139,24 @@ public class InvertedIndexBuilder {
 					invertedIndex.add(stemmer.stem(word).toString(), pathString, i++);
 				}
 			}
+
+			/*
+			 * TODO This is the more efficient solution! It would be great if we were doing
+			 * big data analysis of private datasets (like using elasticsearch). However, it
+			 * is not the most correct or well-encapsulated solution (and problematic when
+			 * we start multithreading). We need it to be correct, well-encapsulated, and
+			 * eventually multithread-friendly for our search engine use case. Move the
+			 * updating of the word count into the inverted index such that every time the
+			 * inverted index is modified, the associated word count is updated.
+			 */
+
 			invertedIndex.addWordCount(pathString, i - 1);
 		}
 	}
 
 	/**
 	 * Populates invertedIndex from mainPath.
-	 * 
+	 *
 	 * @param mainPath file location to be read
 	 * @throws IOException file is invalid or can not be found
 	 */
@@ -157,10 +169,10 @@ public class InvertedIndexBuilder {
 			readFile(mainPath);
 		}
 	}
-	
+
 	/**
 	 * Populates queryList in invertedInverted from mainPath.
-	 * 
+	 *
 	 * @param mainPath file location to be read
 	 * @throws IOException file is invalid or can not be found
 	 */

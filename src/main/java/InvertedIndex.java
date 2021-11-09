@@ -20,23 +20,28 @@ public class InvertedIndex {
 	 * stem appeared.
 	 */
 	private final Map<String, TreeMap<String, TreeSet<Object>>> invertedIndex;
-	
+
 	/**
 	 * This WordCount map holds the word count of the files included in the
 	 * invertedIndex map.
 	 */
 	public final Map<String, Object> wordCount;
-	
+
+	/*
+	 * TODO Move these data structures (queryResult and queryList) into a new
+	 * class... QueryParser or QueryResultBuilder class and move the
+	 * InvertedIndexBuilder.readQueryFile methods there too.
+	 */
 	/**
 	 * This QueryResult map holds lists of queryResults for each query line key.
 	 */
 	public final Map<String, List<QueryResult>> queryResult;
-	
+
 	/**
 	 * This List hold query line sets for future searching.
 	 */
 	private final List<Set<String>> queryList;
-	
+
 	/**
 	 * Initializes invertedIndex and wordCount to new empty TreeMap objects.
 	 */
@@ -60,8 +65,19 @@ public class InvertedIndex {
 		invertedIndex.putIfAbsent(word, new TreeMap<>());
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<Object>());
 		return invertedIndex.get(word).get(location).add(position);
+
+		/*
+		 * TODO Update the word count here instead! Slightly less efficient, but better
+		 * correctness and encapsulation. Remove any other public ways of modifying the
+		 * word count. There are two ways of solving this problem: (1) add 1 to the
+		 * existing word count if a new word was added to the index, or (2) use the max
+		 * word position as the word count (e.g. if hello was found in hello.txt in
+		 * position 42, you know there were at least 42 words in that file). Either
+		 * option works, but (1) is slightly harder to deal with when multithreading.
+		 */
+
 	}
-	
+
 	/**
 	 * Adds  word keys, file location keys, and positions in the index
 	 * (if they does not already exist in the index).
@@ -75,10 +91,10 @@ public class InvertedIndex {
 			add(word, location, i++);
 		}
 	}
-	
+
 	/**
 	 * Adds the word count of a file to the wordCount map.
-	 * 
+	 *
 	 * @param location file location being referenced
 	 * @param count the word count of the file location
 	 * @return true if the count param changes the stored value in wordCount
@@ -88,10 +104,10 @@ public class InvertedIndex {
 				? setWordCount(location, count)
 				: false;
 	}
-	
+
 	/**
 	 * Sets a word count value to a file location key.
-	 * 
+	 *
 	 * @param location name of file location to be assigned as key
 	 * @param count word count of referenced file
 	 * @return true if the map is updated with new (or changed) key value pair
@@ -103,10 +119,10 @@ public class InvertedIndex {
 		wordCount.put(location, count);
 		return true;
 	}
-	
+
 	/**
 	 * Adds a single query line to queryList.
-	 * 
+	 *
 	 * @param query multi stem query represented as a Set
 	 * @return true if the set is updated with the query
 	 */
@@ -115,16 +131,16 @@ public class InvertedIndex {
 				? false
 				: queryList.add(query);
 	}
-	
+
 	/**
 	 * Searches through the inverted index for stems that match (exact or partial)
 	 * the stems in queries.
-	 * 
+	 *
 	 * @param exact represents if exact search should be executed
 	 */
 	public void search(boolean exact) {
 		var queryIterator = queryList.iterator();
-		
+
 		if(exact) {
 			exactSearch(queryIterator);
 		}
@@ -132,10 +148,10 @@ public class InvertedIndex {
 			partialSearch(queryIterator);
 		}
 	}
-	
+
 	/**
 	 * Joins the queryResults of same stem and location, then sorts the list.
-	 * 
+	 *
 	 * @param results list of queryResults to be cleaned and sorted
 	 */
 	public void cleanSortResults(List<QueryResult> results) {
@@ -148,20 +164,28 @@ public class InvertedIndex {
 				}
 			}
 		}
+		// TODO Collections.sort(results);
 		QuickSort.sort(results);
 	}
-	
+
 	/**
 	 * Searches through the invertedIndex to fond exact matches to the query stems.
-	 * 
+	 *
 	 * @param queryIterator iterator of the queryList (list of stems from query)
 	 */
+	// TODO public void exactSearch(Set<String> elem) {
 	public void exactSearch(Iterator<Set<String>> queryIterator) {
 		List<QueryResult> results;
 		QueryResult newQuery;
 		int occurrence = 0;
 		//While there are queries in list
 		while(queryIterator.hasNext()) {
+			/*
+			 * TODO Adjust exactSearch so that it starts basically inside this loop
+			 * and works on a single Set<String> of queries...
+			 *
+			 * Move the looping through ALL of the lines into the new query class.
+			 */
 			results = new ArrayList<>();
 			//Retrieved query
 			var elem = queryIterator.next();
@@ -181,11 +205,11 @@ public class InvertedIndex {
 			queryResult.put(String.join(" ", elem), results);
 		}
 	}
-	
+
 	/**
 	 * Searches through the invertedIndex to find matches that start with the query
 	 * stems.
-	 * 
+	 *
 	 * @param queryIterator iterator of the queryList (list of stems from query)
 	 */
 	public void partialSearch(Iterator<Set<String>> queryIterator) {
@@ -196,7 +220,7 @@ public class InvertedIndex {
 		while(queryIterator.hasNext()) {
 			results = new ArrayList<>();
 			//Retrieved query
-			var elem = queryIterator.next();		
+			var elem = queryIterator.next();
 			//For every stem in query
 			for(String stem: elem) {
 				//For every entry under that stem
@@ -324,7 +348,7 @@ public class InvertedIndex {
 	public String toString() {
 		return this.invertedIndex.toString();
 	}
-	
+
 	/**
 	 * Utilizes the JsonWriter class and writes out invertedIndex in JSON format out
 	 * to output file.
@@ -335,7 +359,7 @@ public class InvertedIndex {
 	public void indexToJson(Path output) throws IOException {
 			JsonWriter.asNestedObject(invertedIndex, output);
 	}
-	
+
 	/**
 	 * Utilizes the JsonWriter class and writes out wordCount in JSON format out
 	 * to output file.
@@ -346,7 +370,7 @@ public class InvertedIndex {
 	public void countToJson(Path output) throws IOException {
 			JsonWriter.asObject(wordCount, output);
 	}
-	
+
 	/**
 	 * Utilizes the JsonWriter class and writes out queryResult in JSON format out
 	 * to output file.
