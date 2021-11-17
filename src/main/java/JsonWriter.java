@@ -371,7 +371,7 @@ public class JsonWriter {
 	 * @param path the file path to use
 	 * @throws IOException if an IO error occurs
 	 *
-	 * @see #asArray(Collection, Writer, Object)
+	 * @see #asArray(Collection, Writer, int)
 	 */
 	public static void asArray(Collection<? extends Object> elements, Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
