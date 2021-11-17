@@ -27,10 +27,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see writeEntry(String, Writer, int)
-	 * @see nextLine(Writer, int)
+	 * @see #writeEntry(String, Writer, int)
+	 * @see #nextLine(Writer, int)
 	 */
-	public static void asArray(Collection<Object> elements, Writer writer,
+	public static void asArray(Collection<? extends Object> elements, Writer writer,
 			int level) throws IOException {
 		writer.write("[");
 		level++;
@@ -58,7 +58,7 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see nextLine(Writer, int)
+	 * @see #nextLine(Writer, int)
 	 */
 	public static void writeEntry(String elem, Writer writer, int level) throws IOException{
 		nextLine(writer, level);
@@ -85,10 +85,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see writeKeyValueEntry(Map.Entry, Writer, int)
-	 * @see nextLine(Writer, int)
+	 * @see #writeKeyValueEntry(Map.Entry, Writer, int)
+	 * @see #nextLine(Writer, int)
 	 */
-	public static void asObject(Map<String, Object> elements, Writer writer,
+	public static void asObject(Map<String, ? extends Object> elements, Writer writer,
 			int level) throws IOException {
 		writer.write("{");
 		level++;
@@ -116,10 +116,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see nextLine(Writer, int)
-	 * @see keyFormat(String, Writer, int)
+	 * @see #nextLine(Writer, int)
+	 * @see #keyFormat(String, Writer, int)
 	 */
-	public static void writeKeyValueEntry(Map.Entry<String, Object> elem,
+	public static void writeKeyValueEntry(Map.Entry<String, ? extends Object> elem,
 			Writer writer, int level) throws IOException{
 		keyFormat(elem.getKey(), writer, level);
 		writer.write(elem.getValue().toString());
@@ -134,8 +134,8 @@ public class JsonWriter {
 	 *
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see quoteEnclose(String, Writer)
-	 * @see nextLine(Writer, int)
+	 * @see #quoteEnclose(String, Writer)
+	 * @see #nextLine(Writer, int)
 	 */
 	private static void keyFormat(String key, Writer writer, int level) throws IOException{
 		nextLine(writer, level);
@@ -166,10 +166,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see writeKVArrayEntry(Map.Entry, Wrtier, int)
-	 * @see nextLine(Writer, int)
+	 * @see #writeKVArrayEntry(Map.Entry, Writer, int)
+	 * @see #nextLine(Writer, int)
 	 */
-	public static void asNestedArray(Map<String, ? extends Collection<Object>> elements,
+	public static void asNestedArray(Map<String, ? extends Collection<? extends Object>> elements,
 			Writer writer, int level) throws IOException {
 		writer.write("{");
 		level++;
@@ -198,11 +198,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see nextLine(Writer, int)
-	 * @see keyFormat(String, Writer, int)
-	 * @see asArray(Collection, Writer, int)
+	 * @see #keyFormat(String, Writer, int)
+	 * @see #asArray(Collection, Writer, int)
 	 */
-	public static void writeKVArrayEntry(Map.Entry<String, ? extends Collection<Object>> elem,
+	public static void writeKVArrayEntry(Map.Entry<String, ? extends Collection<? extends Object>> elem,
 			Writer writer, int level) throws IOException{
 		keyFormat(elem.getKey(), writer, level);
 		asArray(elem.getValue(), writer, level);
@@ -218,10 +217,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see writeKVObjectEntry(Map.Entry, Writer, int)
-	 * @see nextLine(Writer, int)
+	 * @see #writeKVObjectEntry(Map.Entry, Writer, int)
+	 * @see #nextLine(Writer, int)
 	 */
-	public static void asNestedObject(Map<String, ? extends Map<String, ? extends Collection<Object>>> elements,
+	public static void asNestedObject(Map<String, ? extends Map<String, ? extends Collection<? extends Object>>> elements,
 			Writer writer, int level) throws IOException {
 		writer.write("{");
 		level++;
@@ -249,11 +248,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see nextLine(Writer, int)
-	 * @see keyFormat(String, Writer, int)
-	 * @see asNestedArray(Map, Writer, int)
+	 * @see #keyFormat(String, Writer, int)
+	 * @see #asNestedArray(Map, Writer, int)
 	 */
-	public static void writeKVObjectEntry(Map.Entry<String, ? extends Map<String, ? extends Collection<Object>>> elem,
+	public static void writeKVObjectEntry(Map.Entry<String, ? extends Map<String, ? extends Collection<? extends Object>>> elem,
 			Writer writer, int level) throws IOException{
 		keyFormat(elem.getKey(), writer, level);
 		asNestedArray(elem.getValue(), writer, level);
@@ -269,10 +267,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see writeResultEntry(Map.Entry, Writer, int)
-	 * @see nextLine(Writer, int)
+	 * @see #writeResultEntry(Map.Entry, Writer, int)
+	 * @see #nextLine(Writer, int)
 	 */
-	public static void asResult(Map<String, ? extends Collection<QueryResult>> elements, Writer writer, int level) throws IOException {
+	public static void asResult(Map<String, ? extends Collection<InvertedIndex.QueryResult>> elements, Writer writer, int level) throws IOException {
 		writer.write("{");
 		level++;
 
@@ -299,9 +297,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see nextLine(Writer, int)
+	 * @see #keyFormat(String, Writer, int)
+	 * @see #asQueryArray(Collection, Writer, int)
 	 */
-	public static void writeResultEntry(Map.Entry<String, ? extends Collection<QueryResult>> elem, Writer writer, int level) throws IOException {
+	public static void writeResultEntry(Map.Entry<String, ? extends Collection<InvertedIndex.QueryResult>> elem, Writer writer, int level) throws IOException {
 		keyFormat(elem.getKey(), writer, level);
 		asQueryArray(elem.getValue(), writer, level);
 	}
@@ -315,10 +314,10 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see writeQueryEntry(QueryResult, Writer, int)
-	 * @see nextLine(Writer, int)
+	 * @see #writeQueryEntry(InvertedIndex.QueryResult, Writer, int)
+	 * @see #nextLine(Writer, int)
 	 */
-	public static void asQueryArray(Collection<QueryResult> elements, Writer writer, int level) throws IOException {
+	public static void asQueryArray(Collection<InvertedIndex.QueryResult> elements, Writer writer, int level) throws IOException {
 		writer.write("[");
 		level++;
 
@@ -345,11 +344,11 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
 	 * 
-	 * @see nextLine(Writer, int)
-	 * @see keyFormat(String, Writer, int)
-	 * @see quoteEnclose(String, Writer)
+	 * @see #nextLine(Writer, int)
+	 * @see #keyFormat(String, Writer, int)
+	 * @see #quoteEnclose(String, Writer)
 	 */
-	public static void writeQueryEntry(QueryResult elem, Writer writer, int level) throws IOException {
+	public static void writeQueryEntry(InvertedIndex.QueryResult elem, Writer writer, int level) throws IOException {
 		nextLine(writer, level);
 		writer.write("{");
 		keyFormat("count", writer, ++level);
@@ -372,9 +371,9 @@ public class JsonWriter {
 	 * @param path the file path to use
 	 * @throws IOException if an IO error occurs
 	 *
-	 * @see #asArray(Collection, Writer, int)
+	 * @see #asArray(Collection, Writer, Object)
 	 */
-	public static void asArray(Collection<Object> elements, Path path) throws IOException {
+	public static void asArray(Collection<? extends Object> elements, Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asArray(elements, writer, 0);
 		}
@@ -389,7 +388,7 @@ public class JsonWriter {
 	 *
 	 * @see #asObject(Map, Writer, int)
 	 */
-	public static void asObject(Map<String, Object> elements, Path path) throws IOException {
+	public static void asObject(Map<String, ? extends Object> elements, Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asObject(elements, writer, 0);
 		}
@@ -404,7 +403,7 @@ public class JsonWriter {
 	 *
 	 * @see #asNestedArray(Map, Writer, int)
 	 */
-	public static void asNestedArray(Map<String, ? extends Collection<Object>> elements,
+	public static void asNestedArray(Map<String, ? extends Collection<? extends Object>> elements,
 			Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asNestedArray(elements, writer, 0);
@@ -420,7 +419,7 @@ public class JsonWriter {
 	 *
 	 * @see #asNestedArray(Map, Writer, int)
 	 */
-	public static void asNestedObject(Map<String, ? extends Map<String, ? extends Collection<Object>>> elements,
+	public static void asNestedObject(Map<String, ? extends Map<String, ? extends Collection<? extends Object>>> elements,
 			Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asNestedObject(elements, writer, 0);
@@ -436,7 +435,7 @@ public class JsonWriter {
 	 *
 	 * @see #asResult(Map, Writer, int)
 	 */
-	public static void asResult(Map<String, ? extends Collection<QueryResult>> elements,
+	public static void asResult(Map<String, ? extends Collection<InvertedIndex.QueryResult>> elements,
 			Path path) throws IOException {
 		try (BufferedWriter writer = Files.newBufferedWriter(path, StandardCharsets.UTF_8)) {
 			asResult(elements, writer, 0);
@@ -451,7 +450,7 @@ public class JsonWriter {
 	 *
 	 * @see #asArray(Collection, Writer, int)
 	 */
-	public static String asArray(Collection<Object> elements) {
+	public static String asArray(Collection<? extends Object> elements) {
 		try {
 			StringWriter writer = new StringWriter();
 			asArray(elements, writer, 0);
@@ -470,7 +469,7 @@ public class JsonWriter {
 	 *
 	 * @see #asObject(Map, Writer, int)
 	 */
-	public static String asObject(Map<String, Object> elements) {
+	public static String asObject(Map<String, ? extends Object> elements) {
 		try {
 			StringWriter writer = new StringWriter();
 			asObject(elements, writer, 0);
@@ -489,7 +488,7 @@ public class JsonWriter {
 	 *
 	 * @see #asNestedArray(Map, Writer, int)
 	 */
-	public static String asNestedArray(Map<String, ? extends Collection<Object>> elements) {
+	public static String asNestedArray(Map<String, ? extends Collection<? extends Object>> elements) {
 		try {
 			StringWriter writer = new StringWriter();
 			asNestedArray(elements, writer, 0);
@@ -508,7 +507,7 @@ public class JsonWriter {
 	 *
 	 * @see #asNestedObject(Map, Writer, int)
 	 */
-	public static String asNestedObect(Map<String, ? extends Map<String, ? extends Collection<Object>>> elements) {
+	public static String asNestedObect(Map<String, ? extends Map<String, ? extends Collection<? extends Object>>> elements) {
 		try {
 			StringWriter writer = new StringWriter();
 			asNestedObject(elements, writer, 0);
