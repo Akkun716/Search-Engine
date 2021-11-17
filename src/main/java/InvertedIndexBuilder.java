@@ -72,7 +72,7 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * Reads the file path into the specified invertedIndex.
+	 * Reads the file path into the specified invertedIndex. 
 	 *
 	 * @param path file path to be read
 	 * @param invertedIndex the index that will append the stemmed words from the
