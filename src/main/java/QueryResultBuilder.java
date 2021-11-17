@@ -107,7 +107,6 @@ public class QueryResultBuilder {
 	 * 
 	 * @param queryLine String of query search stems
 	 * @param results result of stem search from index
-	 * @return true if the result was able to be added to the map
 	 */
 	public void addResult(String queryLine, List<InvertedIndex.QueryResult> results) {
 		queryResult.put(queryLine, results);
