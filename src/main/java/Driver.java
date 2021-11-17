@@ -24,13 +24,14 @@ public class Driver {
 		Instant start = Instant.now();
 
 		InvertedIndex index = new InvertedIndex();
-		InvertedIndexBuilder builder = new InvertedIndexBuilder(index);
+		InvertedIndexBuilder indexBuilder = new InvertedIndexBuilder(index);
+		QueryResultBuilder queryBuilder = new QueryResultBuilder();
 		ArgumentMap map = new ArgumentMap(args);
 
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
 			try {
-				builder.build(input);
+				indexBuilder.build(input);
 			}
 			catch(Exception e) {
 				if(input == null) {
@@ -46,26 +47,20 @@ public class Driver {
 			Path input = map.getPath("-query");
 			try {
 				if(Files.exists(input)) {
-					builder.buildQuery(input);
+					queryBuilder.build(input);
 				}
 
-				if(map.hasFlag("-exact")) {
-					index.search(true);
-				}
-				else {
-					index.search(false);
-				}
+				index.search(queryBuilder, map.hasFlag("-exact"));
 			}
 			catch(Exception e) {
 				System.out.println("Unable to search from path: " + input.toString());
-				e.printStackTrace(); // TODO Fix
 			}
 		}
 
 		if(map.hasFlag("-results")) {
 			Path output = map.getPath("-results", Path.of("results.json"));
 			try {
-					index.resultToJson(output);
+					queryBuilder.resultToJson(output);
 			}
 			catch(Exception e) {
 				System.out.println("Unable to write out to file: " + output.toString());
