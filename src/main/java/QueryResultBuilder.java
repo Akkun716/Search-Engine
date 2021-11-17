@@ -12,8 +12,11 @@ import java.util.TreeMap;
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
+/**
+ * This class builds a list of queries from file reading as well as storing
+ * query search results by an InvertedIndex (stored in a Map). 
+ */
 public class QueryResultBuilder {
-	
 	/**
 	 * This QueryResult map holds lists of queryResults for each query line key.
 	 */
@@ -90,6 +93,7 @@ public class QueryResultBuilder {
 	 * Adds a single query line to queryList.
 	 *
 	 * @param query multi stem query represented as a Set
+	 * @param queryList list of query sets to be added to
 	 * @return true if the set is updated with the query
 	 */
 	public static boolean addQuery(Set<String> query, List<Set<String>> queryList) {
@@ -142,6 +146,7 @@ public class QueryResultBuilder {
 	 * Searches through the invertedIndex using the list of query requests.
 	 * 
 	 * @param invertedIndex invertedIndex to use
+	 * @param exact boolean determining whether to use partial or exact search
 	 */
 	public void search(InvertedIndex invertedIndex, boolean exact) {
 		var queryIterator = queryList.iterator();
