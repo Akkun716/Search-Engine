@@ -111,7 +111,7 @@ public class InvertedIndex {
 	 * Searches through the invertedIndex to fond exact matches to the query stems.
 	 *
 	 * @param elem query line to be parsed and matched to inverted index entries
-	 * @queryBuilder QueryResultBuilder that will append query search results
+	 * @param queryBuilder QueryResultBuilder that will append query search results
 	 */
 	public void exactSearch(Set<String> elem, QueryResultBuilder queryBuilder) {
 		List<QueryResult> results = new ArrayList<>();
@@ -136,7 +136,7 @@ public class InvertedIndex {
 	 * stems.
 	 *
 	 * @param elem query line to be parsed and matched to inverted index entries
-	 * @queryBuilder QueryResultBuilder that will append query search results
+	 * @param queryBuilder QueryResultBuilder that will append query search results
 	 */
 	public void partialSearch(Set<String> elem, QueryResultBuilder queryBuilder) {
 		List<QueryResult> results = new ArrayList<>();
