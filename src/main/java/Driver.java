@@ -23,11 +23,27 @@ public class Driver {
 		// store initial start time
 		Instant start = Instant.now();
 
-		InvertedIndex index = new InvertedIndex();
+		ArgumentMap map = new ArgumentMap(args);
+		InvertedIndex index;
+
+		if(map.hasFlag("-threads")) {
+			WorkQueue queue;
+			Integer threads = map.getInteger(null);
+			if(threads == null || threads <= 0) {
+				queue = new WorkQueue();
+			}
+			else {
+				queue = new WorkQueue(threads);
+			}
+			index = new ThreadSafeInvertedIndex(queue);
+		}
+		else {
+			index = new InvertedIndex();
+		}
+		
 		InvertedIndexBuilder indexBuilder = new InvertedIndexBuilder(index);
 		QueryResultBuilder queryBuilder = new QueryResultBuilder();
-		ArgumentMap map = new ArgumentMap(args);
-
+		
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
 			try {
