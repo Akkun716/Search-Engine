@@ -65,7 +65,6 @@ public class InvertedIndex {
 		for(String word: words) {
 			add(word, location, i++);
 		}
-		wordCount.put(location, i);
 	}
 
 	/**
