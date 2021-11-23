@@ -14,7 +14,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 /**
  * This class builds a list of queries from file reading as well as storing
- * query search results by an InvertedIndex (stored in a Map). 
+ * query search results by an InvertedIndex (stored in a Map).
  */
 public class QueryResultBuilder {
 	/**
@@ -22,20 +22,22 @@ public class QueryResultBuilder {
 	 */
 	private final Map<String, List<InvertedIndex.QueryResult>> queryResult;
 
+	// TODO private final InvertedIndex index;
+
 	/**
 	 * This List hold query line sets for future searching.
 	 */
-	private final List<Set<String>> queryList;
-	
+	private final List<Set<String>> queryList; // TODO Remove
+
 	/**
 	 * Initializes the queryResult and queryList instance members to a new
 	 * TreeMap and ArrayList respectively.
 	 */
-	public QueryResultBuilder() {
+	public QueryResultBuilder() { // TODO QueryResultBuilder(InvertedIndex index)
 		queryResult = new TreeMap<>();
 		queryList = new ArrayList<>();
 	}
-	
+
 	/**
 	 * Takes in a Path object and uses TextStemmer to parse through the text file(s)
 	 * indicated by the Path and adds them to the invertedIndex HashMap.
@@ -67,6 +69,26 @@ public class QueryResultBuilder {
 		readQueryFile(path, queryList);
 	}
 
+	/* TODO
+	public void build(Path path, boolean exact) throws IOException {
+		try(BufferedReader br = Files.newBufferedReader(path)) {
+			String line;
+			while((line = br.readLine()) != null) {
+				build(line, exact);
+			}
+		}
+	}
+
+	public void build(String line, boolean exact) {
+		var queries = TextStemmer.uniqueStems(line);
+		var joined = String.join(" ", queries);
+
+		if (!queries.isEmpty() && !queryResult.containsKey(joined)) {
+			addResult(joined, invertedIndex.search(queries, exact));
+		}
+	}
+	*/
+
 	/**
 	 * Reads the file path into the specified invertedIndex's queryList.
 	 *
@@ -74,7 +96,7 @@ public class QueryResultBuilder {
 	 * @param queryList the list that will append the stemmed words from the
 	 * 	file
 	 * @throws IOException file is invalid or can not be found
-	 * 
+	 *
 	 * @see #addQuery(Set, List)
 	 */
 	public static void readQueryFile(Path path, List<Set<String>> queryList) throws IOException {
@@ -88,7 +110,7 @@ public class QueryResultBuilder {
 			}
 		}
 	}
-	
+
 	/**
 	 * Adds a single query line to queryList.
 	 *
@@ -101,10 +123,10 @@ public class QueryResultBuilder {
 				? false
 				: queryList.add(query);
 	}
-	
+
 	/**
 	 * Adds a single query match result to queryResult.
-	 * 
+	 *
 	 * @param queryLine String of query search stems
 	 * @param results result of stem search from index
 	 */
@@ -122,13 +144,13 @@ public class QueryResultBuilder {
 		String lower = path.toString().toLowerCase();
 		return lower.endsWith(".txt") || lower.endsWith(".text");
 	}
-	
+
 	/**
 	 * Populates queryList in invertedInverted from mainPath.
 	 *
 	 * @param mainPath file location to be read
 	 * @throws IOException file is invalid or can not be found
-	 * 
+	 *
 	 * @see #readQueryFiles(Path)
 	 * @see #readQueryFile(Path)
 	 */
@@ -140,16 +162,16 @@ public class QueryResultBuilder {
 			readQueryFile(mainPath);
 		}
 	}
-	
+
 	/**
 	 * Searches through the invertedIndex using the list of query requests.
-	 * 
+	 *
 	 * @param invertedIndex invertedIndex to use
 	 * @param exact boolean determining whether to use partial or exact search
 	 */
-	public void search(InvertedIndex invertedIndex, boolean exact) {
+	public void search(InvertedIndex invertedIndex, boolean exact) { // TODO Remove inverted index parameter
 		var queryIterator = queryList.iterator();
-		
+
 		if(exact) {
 			while(queryIterator.hasNext()) {
 				invertedIndex.exactSearch(queryIterator.next(), this);
@@ -161,7 +183,7 @@ public class QueryResultBuilder {
 			}
 		}
 	}
-	
+
 	/**
 	 * Utilizes the JsonWriter class and writes out queryResult in JSON format out
 	 * to output file.

@@ -46,7 +46,7 @@ public class Driver {
 		if(map.hasFlag("-query") && map.getPath("-query") != null) {
 			Path input = map.getPath("-query");
 			try {
-				if(Files.exists(input)) {
+				if(Files.exists(input)) { // TODO Remove
 					queryBuilder.build(input);
 				}
 
