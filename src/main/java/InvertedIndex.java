@@ -49,7 +49,7 @@ public class InvertedIndex {
 		if(!wordCount.containsKey(location) || wordCount.get(location) < position) {
 			wordCount.put(location, position);
 		}
-				
+
 		return invertedIndex.get(word).get(location).add(position);
 	}
 
@@ -103,6 +103,11 @@ public class InvertedIndex {
 	 * @param queryBuilder the queryBuilder to use for search
 	 * @param exact represents if exact search should be executed
 	 */
+	/* TODO
+	public List<QueryResult> search(Set<String> queries, boolean exact) {
+		return exact ? exactSearch(queries) : partialSearch(queries);
+	}
+	*/
 	public void search(QueryResultBuilder queryBuilder, boolean exact) {
 		queryBuilder.search(this, exact);
 	}
@@ -113,6 +118,7 @@ public class InvertedIndex {
 	 * @param elem query line to be parsed and matched to inverted index entries
 	 * @param queryBuilder QueryResultBuilder that will append query search results
 	 */
+// TODO 	public List<QueryResult> exactSearch(Set<String> elem) {
 	public void exactSearch(Set<String> elem, QueryResultBuilder queryBuilder) {
 		List<QueryResult> results = new ArrayList<>();
 		int occurrence;
@@ -128,8 +134,38 @@ public class InvertedIndex {
 			}
 		}
 		cleanSortResults(results);
+		// TODO return results;
 		queryBuilder.addResult(String.join(" ", elem), results);
 	}
+
+	/* TODO
+	public List<QueryResult> exactSearch2(Set<String> elem) {
+		List<QueryResult> results = new ArrayList<>();
+		Map<String, QueryResult> lookup = null;
+
+		int occurrence;
+
+		for(String stem: elem) {
+			if(invertedIndex.containsKey(stem)) {
+				for(String fileLocation: invertedIndex.get(stem).keySet()) {
+					occurrence = invertedIndex.get(stem).get(fileLocation).size();
+
+					if (lookup.containsKey(fileLocation)) {
+						lookup.get(fileLocation).update( set both the score and matches );
+					}
+					else {
+						var result = new QueryResult(wordCount.get(fileLocation), occurrence, fileLocation);
+						results.add(result);
+						lookup.put(fileLocation, result);
+					}
+				}
+			}
+		}
+
+		Collections.sort(results);
+		return results;
+	}
+	*/
 
 	/**
 	 * Searches through the invertedIndex to find matches that start with the query
@@ -143,6 +179,13 @@ public class InvertedIndex {
 		int occurrence;
 		//For every stem in query
 		for(String stem: elem) {
+			/*
+			 * TODO Use tailMap to start with the first partial match and break when no
+			 * longer have a match for more efficient partial search. It should look similar
+			 * to this example (except using tailMap instead of tailSet):
+			 *
+			 * https://github.com/usf-cs272-fall2021/lectures/blob/c1db02433496c7d6238437963a2bf6cf03eece2b/DataStructures/src/main/java/FindDemo.java#L144-L157
+			 */
 			//For every entry under that stem
 			for(String stemKey: invertedIndex.keySet()) {
 				if(stemKey.startsWith(stem)) {
@@ -306,7 +349,7 @@ public class InvertedIndex {
 	public void countToJson(Path output) throws IOException {
 			JsonWriter.asObject(wordCount, output);
 	}
-	
+
 	/**
 	 * This class holds the results from the query search.
 	 */
