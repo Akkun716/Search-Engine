@@ -18,7 +18,7 @@ public class InvertedIndex {
 	 * keys which are then paired to an array of positions in the file the word
 	 * stem appeared.
 	 */
-	private final Map<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
+	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 
 	/**
 	 * This WordCount map holds the word count of the files included in the
@@ -100,61 +100,42 @@ public class InvertedIndex {
 	 * Searches through the inverted index for stems that match (exact or partial)
 	 * the stems in queries.
 	 *
-	 * @param queryBuilder the queryBuilder to use for search
+	 * @param queries the queries to use for search
 	 * @param exact represents if exact search should be executed
+	 * @return the list of query search results
 	 */
-	/* TODO
 	public List<QueryResult> search(Set<String> queries, boolean exact) {
-		return exact ? exactSearch(queries) : partialSearch(queries);
-	}
-	*/
-	public void search(QueryResultBuilder queryBuilder, boolean exact) {
-		queryBuilder.search(this, exact);
+		return exact
+				? exactSearch(queries)
+				: partialSearch(queries);
 	}
 
 	/**
 	 * Searches through the invertedIndex to fond exact matches to the query stems.
 	 *
 	 * @param elem query line to be parsed and matched to inverted index entries
-	 * @param queryBuilder QueryResultBuilder that will append query search results
+	 * @return the list of query search results
 	 */
-// TODO 	public List<QueryResult> exactSearch(Set<String> elem) {
-	public void exactSearch(Set<String> elem, QueryResultBuilder queryBuilder) {
+	public List<QueryResult> exactSearch(Set<String> elem) {
 		List<QueryResult> results = new ArrayList<>();
-		int occurrence;
-		//For every stem in query
-		for(String stem: elem) {
-			//If the index has the query stem
-			if(hasStem(stem)) {
-				//For every entry under that stem
-				for(String fileLocation: getLocations(stem)) {
-					occurrence = invertedIndex.get(stem).get(fileLocation).size();
-					results.add(new QueryResult(wordCount.get(fileLocation), occurrence, fileLocation));
-				}
-			}
-		}
-		cleanSortResults(results);
-		// TODO return results;
-		queryBuilder.addResult(String.join(" ", elem), results);
-	}
-
-	/* TODO
-	public List<QueryResult> exactSearch2(Set<String> elem) {
-		List<QueryResult> results = new ArrayList<>();
-		Map<String, QueryResult> lookup = null;
+		Map<String, QueryResult> lookup = new TreeMap<>();
+		QueryResult queryResult = null;
 
 		int occurrence;
 
+		//For each stem in query set elem
 		for(String stem: elem) {
 			if(invertedIndex.containsKey(stem)) {
+				//For every entry under that stem
 				for(String fileLocation: invertedIndex.get(stem).keySet()) {
 					occurrence = invertedIndex.get(stem).get(fileLocation).size();
 
 					if (lookup.containsKey(fileLocation)) {
-						lookup.get(fileLocation).update( set both the score and matches );
+						queryResult = lookup.get(fileLocation);
+						queryResult.updateMatchCount(queryResult.getMatchCount() + occurrence);
 					}
 					else {
-						var result = new QueryResult(wordCount.get(fileLocation), occurrence, fileLocation);
+						QueryResult result = new QueryResult(wordCount.get(fileLocation), occurrence, fileLocation);
 						results.add(result);
 						lookup.put(fileLocation, result);
 					}
@@ -165,57 +146,45 @@ public class InvertedIndex {
 		Collections.sort(results);
 		return results;
 	}
-	*/
 
 	/**
 	 * Searches through the invertedIndex to find matches that start with the query
 	 * stems.
 	 *
 	 * @param elem query line to be parsed and matched to inverted index entries
-	 * @param queryBuilder QueryResultBuilder that will append query search results
+	 * @return the list of query search results
 	 */
-	public void partialSearch(Set<String> elem, QueryResultBuilder queryBuilder) {
+	public List<QueryResult> partialSearch(Set<String> elem) {
 		List<QueryResult> results = new ArrayList<>();
+		Map<String, QueryResult> lookup = new TreeMap<>();
+		QueryResult queryResult = null;
 		int occurrence;
 		//For every stem in query
 		for(String stem: elem) {
-			/*
-			 * TODO Use tailMap to start with the first partial match and break when no
-			 * longer have a match for more efficient partial search. It should look similar
-			 * to this example (except using tailMap instead of tailSet):
-			 *
-			 * https://github.com/usf-cs272-fall2021/lectures/blob/c1db02433496c7d6238437963a2bf6cf03eece2b/DataStructures/src/main/java/FindDemo.java#L144-L157
-			 */
 			//For every entry under that stem
-			for(String stemKey: invertedIndex.keySet()) {
+			for(String stemKey: invertedIndex.tailMap(stem).keySet()) {
 				if(stemKey.startsWith(stem)) {
-					for(String fileLocation: getLocations(stemKey)) {
+					for(String fileLocation: invertedIndex.get(stemKey).keySet()) {
 						occurrence = invertedIndex.get(stemKey).get(fileLocation).size();
-						results.add(new QueryResult(wordCount.get(fileLocation), occurrence, fileLocation));
+						if (lookup.containsKey(fileLocation)) {
+							queryResult = lookup.get(fileLocation);
+							queryResult.updateMatchCount(queryResult.getMatchCount() + occurrence);
+						}
+						else {
+							QueryResult result = new QueryResult(wordCount.get(fileLocation), occurrence, fileLocation);
+							results.add(result);
+							lookup.put(fileLocation, result);
+						}
 					}
 				}
-			}
-		}
-		cleanSortResults(results);
-		queryBuilder.addResult(String.join(" ", elem), results);
-	}
-
-	/**
-	 * Joins the queryResults of same stem and location, then sorts the list.
-	 *
-	 * @param results list of queryResults to be cleaned and sorted
-	 */
-	public void cleanSortResults(List<QueryResult> results) {
-		for(int elemIndex = 0; elemIndex < results.size() - 1; elemIndex++) {
-			for(int nextElem = elemIndex + 1; nextElem < results.size(); nextElem++) {
-				if(results.get(elemIndex).location.equals(results.get(nextElem).location)) {
-					results.get(elemIndex).combine(results.get(nextElem));
-					results.remove(nextElem);
-					nextElem--;
+				//No more stemKeys that start with stem, exit loop
+				else {
+					break;
 				}
 			}
 		}
 		Collections.sort(results);
+		return results;
 	}
 
 	/**
@@ -391,7 +360,7 @@ public class InvertedIndex {
 		 * @param result QueryResult to be absorbed
 		 */
 		public void combine(QueryResult result) {
-			setMatchCount(matchCount + result.matchCount);
+			updateMatchCount(matchCount + result.matchCount);
 		}
 
 		/**
@@ -399,7 +368,7 @@ public class InvertedIndex {
 		 *
 		 * @param matchCount new value matchCount should be set to
 		 */
-		public void setMatchCount(int matchCount) {
+		public void updateMatchCount(int matchCount) {
 			this.matchCount = matchCount;
 			setScore((double) this.matchCount / wordCount);
 		}
