@@ -1,4 +1,3 @@
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -25,7 +24,7 @@ public class Driver {
 
 		InvertedIndex index = new InvertedIndex();
 		InvertedIndexBuilder indexBuilder = new InvertedIndexBuilder(index);
-		QueryResultBuilder queryBuilder = new QueryResultBuilder();
+		QueryResultBuilder queryBuilder = new QueryResultBuilder(index);
 		ArgumentMap map = new ArgumentMap(args);
 
 		if(map.hasFlag("-text")) {
@@ -46,11 +45,7 @@ public class Driver {
 		if(map.hasFlag("-query") && map.getPath("-query") != null) {
 			Path input = map.getPath("-query");
 			try {
-				if(Files.exists(input)) { // TODO Remove
-					queryBuilder.build(input);
-				}
-
-				index.search(queryBuilder, map.hasFlag("-exact"));
+				queryBuilder.build(input, map.hasFlag("-exact"));
 			}
 			catch(Exception e) {
 				System.out.println("Unable to search from path: " + input.toString());
@@ -60,7 +55,7 @@ public class Driver {
 		if(map.hasFlag("-results")) {
 			Path output = map.getPath("-results", Path.of("results.json"));
 			try {
-					queryBuilder.resultToJson(output);
+				queryBuilder.resultToJson(output);
 			}
 			catch(Exception e) {
 				System.out.println("Unable to write out to file: " + output.toString());
