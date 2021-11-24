@@ -15,9 +15,7 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
  */
 public class InvertedIndexBuilder {
 	/**
-	 * This map will hold stemmed words as keys and a treeMap as values. Those treeMaps
-	 * will hold file locations as keys and arrayList of Integers as values. These
-	 * Integers represent the position of the stemmed word occurrences.
+	 * This InvertedIndex will be a reference for the index passed into the function.
 	 */
 	private final InvertedIndex invertedIndex;
 
