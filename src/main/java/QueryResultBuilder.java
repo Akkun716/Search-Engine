@@ -25,6 +25,8 @@ public class QueryResultBuilder {
 	/**
 	 * Initializes the queryResult and queryList instance members to a new
 	 * TreeMap and ArrayList respectively.
+	 * 
+	 * @param index invertedIndex to be referenced
 	 */
 	public QueryResultBuilder(InvertedIndex index) {
 		this.index = index;
@@ -118,9 +120,8 @@ public class QueryResultBuilder {
 	 * Reads the line into the invertedIndex map's queryList of the
 	 * builder.
 	 *
-	 * @param path file path to be read
+	 * @param line query line from file to be read and possibly added
 	 * @param exact determines whether exact search should be performed
-	 * @throws IOException file is invalid or can not be found
 	 * 
 	 * @see #addResult(String, List)
 	 */
