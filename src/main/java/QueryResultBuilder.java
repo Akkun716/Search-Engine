@@ -3,14 +3,9 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
-
-import opennlp.tools.stemmer.Stemmer;
-import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 /**
  * This class builds a list of queries from file reading as well as storing
@@ -22,116 +17,49 @@ public class QueryResultBuilder {
 	 */
 	private final Map<String, List<InvertedIndex.QueryResult>> queryResult;
 
-	// TODO private final InvertedIndex index;
-
 	/**
-	 * This List hold query line sets for future searching.
+	 * This InvertedIndex will be a reference for the index passed into the function.
 	 */
-	private final List<Set<String>> queryList; // TODO Remove
+	private final InvertedIndex index;
 
 	/**
 	 * Initializes the queryResult and queryList instance members to a new
 	 * TreeMap and ArrayList respectively.
 	 */
-	public QueryResultBuilder() { // TODO QueryResultBuilder(InvertedIndex index)
+	public QueryResultBuilder(InvertedIndex index) {
+		this.index = index;
 		queryResult = new TreeMap<>();
-		queryList = new ArrayList<>();
 	}
 
 	/**
-	 * Takes in a Path object and uses TextStemmer to parse through the text file(s)
-	 * indicated by the Path and adds them to the invertedIndex HashMap.
+	 * Simple build() defaulting exact value to false.
 	 *
-	 * @param mainPath path that points to file/dir to be processed
+	 * @param mainPath file location to be read
 	 * @throws IOException file is invalid or can not be found
+	 * 
+	 * @see #build(Path, boolean)
 	 */
-	public void readQueryFiles(Path mainPath) throws IOException {
-		try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
-			for(Path path: stream) {
-				if(Files.isDirectory(path)) {
-					readQueryFiles(path);
-				}
-				else if(isTextFile(path)) {
-					readQueryFile(path);
-				}
-			}
-		}
+	public void build(Path mainPath) throws IOException {
+		build(mainPath, false);
 	}
-
+	
 	/**
-	 * Reads the file path into the default invertedIndex map's queryList of the
-	 * builder.
+	 * Populates queryList in invertedInverted from mainPath.
 	 *
-	 * @param path file path to be read
-	 * @throws IOException file is invalid or can not be found
-	 */
-	public void readQueryFile(Path path) throws IOException {
-		readQueryFile(path, queryList);
-	}
-
-	/* TODO
-	public void build(Path path, boolean exact) throws IOException {
-		try(BufferedReader br = Files.newBufferedReader(path)) {
-			String line;
-			while((line = br.readLine()) != null) {
-				build(line, exact);
-			}
-		}
-	}
-
-	public void build(String line, boolean exact) {
-		var queries = TextStemmer.uniqueStems(line);
-		var joined = String.join(" ", queries);
-
-		if (!queries.isEmpty() && !queryResult.containsKey(joined)) {
-			addResult(joined, invertedIndex.search(queries, exact));
-		}
-	}
-	*/
-
-	/**
-	 * Reads the file path into the specified invertedIndex's queryList.
-	 *
-	 * @param path file path to be read
-	 * @param queryList the list that will append the stemmed words from the
-	 * 	file
+	 * @param mainPath file location to be read
+	 * @param exact determines whether exact search should be performed
 	 * @throws IOException file is invalid or can not be found
 	 *
-	 * @see #addQuery(Set, List)
+	 * @see #readQueryFiles(Path, boolean)
+	 * @see #readQueryFile(Path, boolean)
 	 */
-	public static void readQueryFile(Path path, List<Set<String>> queryList) throws IOException {
-		try(BufferedReader br = Files.newBufferedReader(path)) {
-			Stemmer stemmer = new SnowballStemmer(TextStemmer.ENGLISH);
-			String line;
-			Set<String> query;
-			while((line = br.readLine()) != null) {
-				query = TextStemmer.uniqueStems(line, stemmer);
-				addQuery(query, queryList);
-			}
+	public void build(Path mainPath, boolean exact) throws IOException {
+		if(Files.isDirectory(mainPath)) {
+			readQueryFiles(mainPath, exact);
 		}
-	}
-
-	/**
-	 * Adds a single query line to queryList.
-	 *
-	 * @param query multi stem query represented as a Set
-	 * @param queryList list of query sets to be added to
-	 * @return true if the set is updated with the query
-	 */
-	public static boolean addQuery(Set<String> query, List<Set<String>> queryList) {
-		return query.isEmpty() || queryList.contains(query)
-				? false
-				: queryList.add(query);
-	}
-
-	/**
-	 * Adds a single query match result to queryResult.
-	 *
-	 * @param queryLine String of query search stems
-	 * @param results result of stem search from index
-	 */
-	public void addResult(String queryLine, List<InvertedIndex.QueryResult> results) {
-		queryResult.put(queryLine, results);
+		else {
+			readQueryFile(mainPath, exact);
+		}
 	}
 
 	/**
@@ -146,42 +74,73 @@ public class QueryResultBuilder {
 	}
 
 	/**
-	 * Populates queryList in invertedInverted from mainPath.
+	 * Takes in a Path object and parses through the directory(s) and text file(s) within
+	 * them. Uses the queries within the files to search in the index passed into builder. 
 	 *
-	 * @param mainPath file location to be read
+	 * @param mainPath path that points to file/dir to be processed
+	 * @param exact determines whether exact search should be performed
 	 * @throws IOException file is invalid or can not be found
-	 *
-	 * @see #readQueryFiles(Path)
-	 * @see #readQueryFile(Path)
+	 * 
+	 * @see #readQueryFile(Path, boolean)
 	 */
-	public void build(Path mainPath) throws IOException {
-		if(Files.isDirectory(mainPath)) {
-			readQueryFiles(mainPath);
-		}
-		else {
-			readQueryFile(mainPath);
+	public void readQueryFiles(Path mainPath, boolean exact) throws IOException {
+		try(DirectoryStream<Path> stream = Files.newDirectoryStream(mainPath)) {
+			for(Path path: stream) {
+				if(Files.isDirectory(path)) {
+					readQueryFiles(path, exact);
+				}
+				else if(isTextFile(path)) {
+					readQueryFile(path, exact);
+				}
+			}
 		}
 	}
 
 	/**
-	 * Searches through the invertedIndex using the list of query requests.
+	 * Reads the file path into the  of the builder.
 	 *
-	 * @param invertedIndex invertedIndex to use
-	 * @param exact boolean determining whether to use partial or exact search
+	 * @param path file path to be read
+	 * @param exact determines whether exact search should be performed
+	 * @throws IOException file is invalid or can not be found
+	 * 
+	 * @see #readQueryLine(String, boolean)
 	 */
-	public void search(InvertedIndex invertedIndex, boolean exact) { // TODO Remove inverted index parameter
-		var queryIterator = queryList.iterator();
+	public void readQueryFile(Path path, boolean exact) throws IOException {
+		try(BufferedReader br = Files.newBufferedReader(path)) {
+			String line;
+			while((line = br.readLine()) != null) {
+				readQueryLine(line, exact);
+			}
+		}
+	}
 
-		if(exact) {
-			while(queryIterator.hasNext()) {
-				invertedIndex.exactSearch(queryIterator.next(), this);
-			}
+	/**
+	 * Reads the line into the invertedIndex map's queryList of the
+	 * builder.
+	 *
+	 * @param path file path to be read
+	 * @param exact determines whether exact search should be performed
+	 * @throws IOException file is invalid or can not be found
+	 * 
+	 * @see #addResult(String, List)
+	 */
+	public void readQueryLine(String line, boolean exact) {
+		var queries = TextStemmer.uniqueStems(line);
+		var joined = String.join(" ", queries);
+
+		if (!queries.isEmpty() && !queryResult.containsKey(joined)) {
+			addResult(joined, index.search(queries, exact));
 		}
-		else {
-			while(queryIterator.hasNext()) {
-				invertedIndex.partialSearch(queryIterator.next(), this);
-			}
-		}
+	}
+
+	/**
+	 * Adds a single query match result to queryResult.
+	 *
+	 * @param queryLine String of query search stems
+	 * @param results result of stem search from index
+	 */
+	public void addResult(String queryLine, List<InvertedIndex.QueryResult> results) {
+		queryResult.put(queryLine, results);
 	}
 
 	/**
