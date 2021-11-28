@@ -32,10 +32,10 @@ public class TextStemmer {
 	/**
 	 * This stems the words in a line and adds them to the collection object passed
 	 * in the function.
-	 * 
+	 *
 	 * @param line line of text to be parsed and each word stemmed
 	 * @param stemmer Stemmer object instance which will clean and parse the line
-	 * @param output Collection object each stemmed word will be added to 
+	 * @param output Collection object each stemmed word will be added to
 	 */
 	public static void stemLine(String line, Stemmer stemmer, Collection<String> output) {
 		for(String word: TextParser.parse(line)) {
@@ -43,6 +43,15 @@ public class TextStemmer {
 		}
 	}
 
+	/*
+	 * TODO Instead of this in your Javadoc:
+	 * @see stemLine(String, Stemmer, Collection)
+	 * ...try this instead:
+	 * @see #stemLine(String, Stemmer, Collection)
+	 *
+	 * The # means it is referencing something in the current class
+	 * and will remove any Javadoc warnings in this class.
+	 */
 	/**
 	 * Parses each line into cleaned and stemmed words.
 	 *
@@ -75,11 +84,11 @@ public class TextStemmer {
 	/**
 	 * Rather than just a single line (like in listStem), a file is read through
 	 * via BufferedReader and listStem is called on each line.
-	 * 
+	 *
 	 * @param input the file path to be parsed each word stemmed
 	 * @param output the Collection object each stemmed word will be added to
 	 * @throws IOException if unable to read or parse file
-	 * 
+	 *
 	 * @see SnowballStemmer
 	 * @see #ENGLISH
 	 * @see stemLine(String, Stemmer, Collection)
@@ -93,7 +102,7 @@ public class TextStemmer {
 			}
 		}
 	}
-	
+
 	/**
 	 * Reads a file line by line, parses each line into cleaned and stemmed words
 	 * using the default stemmer.
@@ -175,7 +184,7 @@ public class TextStemmer {
 			ArrayList<Set<String>> output = new ArrayList<Set<String>>();
 			Stemmer stemmer = new SnowballStemmer(ENGLISH);
 			String line;
-			
+
 			while((line = br.readLine()) != null) {
 				output.add(uniqueStems(line, stemmer));
 			}

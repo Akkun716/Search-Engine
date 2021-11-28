@@ -25,7 +25,7 @@ public class QueryResultBuilder {
 	/**
 	 * Initializes the queryResult and queryList instance members to a new
 	 * TreeMap and ArrayList respectively.
-	 * 
+	 *
 	 * @param index invertedIndex to be referenced
 	 */
 	public QueryResultBuilder(InvertedIndex index) {
@@ -38,13 +38,13 @@ public class QueryResultBuilder {
 	 *
 	 * @param mainPath file location to be read
 	 * @throws IOException file is invalid or can not be found
-	 * 
+	 *
 	 * @see #build(Path, boolean)
 	 */
 	public void build(Path mainPath) throws IOException {
 		build(mainPath, false);
 	}
-	
+
 	/**
 	 * Populates queryList in invertedInverted from mainPath.
 	 *
@@ -64,6 +64,7 @@ public class QueryResultBuilder {
 		}
 	}
 
+	// TODO Remove, if you need this call InvertedIndexBuilder.isTextFile instead
 	/**
 	 * This checks to see if a path leads to a text file.
 	 *
@@ -77,12 +78,12 @@ public class QueryResultBuilder {
 
 	/**
 	 * Takes in a Path object and parses through the directory(s) and text file(s) within
-	 * them. Uses the queries within the files to search in the index passed into builder. 
+	 * them. Uses the queries within the files to search in the index passed into builder.
 	 *
 	 * @param mainPath path that points to file/dir to be processed
 	 * @param exact determines whether exact search should be performed
 	 * @throws IOException file is invalid or can not be found
-	 * 
+	 *
 	 * @see #readQueryFile(Path, boolean)
 	 */
 	public void readQueryFiles(Path mainPath, boolean exact) throws IOException {
@@ -104,7 +105,7 @@ public class QueryResultBuilder {
 	 * @param path file path to be read
 	 * @param exact determines whether exact search should be performed
 	 * @throws IOException file is invalid or can not be found
-	 * 
+	 *
 	 * @see #readQueryLine(String, boolean)
 	 */
 	public void readQueryFile(Path path, boolean exact) throws IOException {
@@ -122,7 +123,7 @@ public class QueryResultBuilder {
 	 *
 	 * @param line query line from file to be read and possibly added
 	 * @param exact determines whether exact search should be performed
-	 * 
+	 *
 	 * @see #addResult(String, List)
 	 */
 	public void readQueryLine(String line, boolean exact) {
@@ -134,6 +135,7 @@ public class QueryResultBuilder {
 		}
 	}
 
+	// TODO Make private? Breaks encapsulation if we can put any arbitrary results into the map.
 	/**
 	 * Adds a single query match result to queryResult.
 	 *

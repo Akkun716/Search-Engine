@@ -26,7 +26,7 @@ public class JsonWriter {
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #writeEntry(String, Writer, int)
 	 * @see #nextLine(Writer, int)
 	 */
@@ -52,22 +52,22 @@ public class JsonWriter {
 
 	/**
 	 * Outputs array element to writer with JSON level formatting.
-	 * 
+	 *
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #nextLine(Writer, int)
 	 */
 	public static void writeEntry(String elem, Writer writer, int level) throws IOException{
 		nextLine(writer, level);
 		writer.write(elem);
 	}
-	
+
 	/**
 	 * Adds new line and indent level to input writer.
-	 * 
+	 *
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
@@ -84,7 +84,7 @@ public class JsonWriter {
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #writeKeyValueEntry(Map.Entry, Writer, int)
 	 * @see #nextLine(Writer, int)
 	 */
@@ -107,15 +107,15 @@ public class JsonWriter {
 		nextLine(writer, --level);
 		writer.write("}");
 	}
-	
+
 	/**
 	 * Outputs object element to writer with JSON level formatting.
-	 * 
+	 *
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #nextLine(Writer, int)
 	 * @see #keyFormat(String, Writer, int)
 	 */
@@ -133,7 +133,7 @@ public class JsonWriter {
 	 * @param level the initial indent level
 	 *
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #quoteEnclose(String, Writer)
 	 * @see #nextLine(Writer, int)
 	 */
@@ -142,7 +142,7 @@ public class JsonWriter {
 		quoteEnclose(key, writer);
 		writer.write(": ");
 	}
-	
+
 	/**
 	 * Places quotes around an input String.
 	 *
@@ -165,7 +165,7 @@ public class JsonWriter {
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #writeKVArrayEntry(Map.Entry, Writer, int)
 	 * @see #nextLine(Writer, int)
 	 */
@@ -188,16 +188,16 @@ public class JsonWriter {
 		nextLine(writer, --level);
 		writer.write("}");
 	}
-	
-	
+
+
 	/**
 	 * Outputs nested array element to writer with JSON level formatting.
-	 * 
+	 *
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #keyFormat(String, Writer, int)
 	 * @see #asArray(Collection, Writer, int)
 	 */
@@ -216,7 +216,7 @@ public class JsonWriter {
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #writeKVObjectEntry(Map.Entry, Writer, int)
 	 * @see #nextLine(Writer, int)
 	 */
@@ -239,15 +239,15 @@ public class JsonWriter {
 		nextLine(writer, --level);
 		writer.write("}");
 	}
-	
+
 	/**
 	 * Outputs nested object element to writer with JSON level formatting.
-	 * 
+	 *
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #keyFormat(String, Writer, int)
 	 * @see #asNestedArray(Map, Writer, int)
 	 */
@@ -256,7 +256,7 @@ public class JsonWriter {
 		keyFormat(elem.getKey(), writer, level);
 		asNestedArray(elem.getValue(), writer, level);
 	}
-	
+
 	/**
 	 * Writes the elements as a pretty JSON query result with nested arrays. The
 	 * generic notation used allows this method to be used for any type of map with
@@ -266,7 +266,7 @@ public class JsonWriter {
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #writeResultEntry(Map.Entry, Writer, int)
 	 * @see #nextLine(Writer, int)
 	 */
@@ -288,15 +288,15 @@ public class JsonWriter {
 		nextLine(writer, --level);
 		writer.write("}");
 	}
-	
+
 	/**
 	 * Outputs result element to writer with JSON level formatting.
-	 * 
+	 *
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #keyFormat(String, Writer, int)
 	 * @see #asQueryArray(Collection, Writer, int)
 	 */
@@ -304,16 +304,16 @@ public class JsonWriter {
 		keyFormat(elem.getKey(), writer, level);
 		asQueryArray(elem.getValue(), writer, level);
 	}
-	
+
 	/**
 	 * Writes the elements as a pretty JSON queryResult arrays. The generic notation
 	 * used allows this method to be used for any collection of QueryResult.
-	 * 
+	 *
 	 * @param elements the elements to write
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #writeQueryEntry(InvertedIndex.QueryResult, Writer, int)
 	 * @see #nextLine(Writer, int)
 	 */
@@ -335,15 +335,15 @@ public class JsonWriter {
 		nextLine(writer, --level);
 		writer.write("]");
 	}
-	
+
 	/**
 	 * Outputs query element to writer with JSON level formating.
-	 * 
+	 *
 	 * @param elem the element to be written in
 	 * @param writer the writer to use
 	 * @param level the initial indent level
 	 * @throws IOException if an IO error occurs
-	 * 
+	 *
 	 * @see #nextLine(Writer, int)
 	 * @see #keyFormat(String, Writer, int)
 	 * @see #quoteEnclose(String, Writer)
@@ -361,7 +361,6 @@ public class JsonWriter {
 		quoteEnclose(elem.getLocation().toString(), writer);
 		nextLine(writer, --level);
 		writer.write("}");
-		
 	}
 
 	/**
@@ -425,10 +424,10 @@ public class JsonWriter {
 			asNestedObject(elements, writer, 0);
 		}
 	}
-	
+
 	/**
 	 * Writes the elements as a pretty JSON query result with nested objects to file.
-	 * 
+	 *
 	 * @param elements the elements to write
 	 * @param path the file path to use
 	 * @throws IOException if an IO error occurs
