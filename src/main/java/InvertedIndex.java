@@ -46,6 +46,8 @@ public class InvertedIndex {
 	public boolean add(String word, String location, Integer position) {
 		invertedIndex.putIfAbsent(word, new TreeMap<>());
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<Integer>());
+
+		// TODO if (wordCount.getOrDefault(location, 0) < position)
 		if(!wordCount.containsKey(location) || wordCount.get(location) < position) {
 			wordCount.put(location, position);
 		}
@@ -68,6 +70,7 @@ public class InvertedIndex {
 		wordCount.put(location, i);
 	}
 
+	// TODO Remove to fully encapsulate word counts
 	/**
 	 * Adds the word count of a file to the wordCount map.
 	 *
@@ -81,6 +84,7 @@ public class InvertedIndex {
 				: false;
 	}
 
+//TODO Make private to fully encapsulate word counts
 	/**
 	 * Sets a word count value to a file location key.
 	 *
@@ -132,6 +136,12 @@ public class InvertedIndex {
 
 					if (lookup.containsKey(fileLocation)) {
 						queryResult = lookup.get(fileLocation);
+						/*
+						 * TODO Make this logic more reusable by moving the call
+						 * invertedIndex.get(stem).get(fileLocation).size();
+						 *
+						 * ...into updateMatchCount. See QueryResult for more.
+						 */
 						queryResult.updateMatchCount(queryResult.getMatchCount() + occurrence);
 					}
 					else {
@@ -139,6 +149,24 @@ public class InvertedIndex {
 						results.add(result);
 						lookup.put(fileLocation, result);
 					}
+
+					/* TODO After moving more work into QueryREsult and better encapsulating:
+
+					...first get the result
+					queryResult = lookup.get(fileLocation);
+
+					...if the result was null, create a new result and add to data structures
+					if (queryResult == null) {
+						QueryResult result = new QueryResult(fileLocation);
+						results.add(result);
+						lookup.put(fileLocation, result);
+					}
+
+					...always have a valid result by this point
+					...go ahead and update the match and score
+					queryResult.updateMatchCount(stem);
+					 */
+
 				}
 			}
 		}
@@ -164,6 +192,11 @@ public class InvertedIndex {
 			//For every entry under that stem
 			for(String stemKey: invertedIndex.tailMap(stem).keySet()) {
 				if(stemKey.startsWith(stem)) {
+					/*
+					 * TODO This loop below is duplicate logic... move into a private
+					 * search helper and then call that helper method in both exact and
+					 * partial search!
+					 */
 					for(String fileLocation: invertedIndex.get(stemKey).keySet()) {
 						occurrence = invertedIndex.get(stemKey).get(fileLocation).size();
 						if (lookup.containsKey(fileLocation)) {
@@ -330,7 +363,7 @@ public class InvertedIndex {
 		/**
 		 * Represents the number of words found from file location in invertedIndex.
 		 */
-		private Integer wordCount;
+		private Integer wordCount; // TODO Remove, access wordCount map member directly instead
 		/**
 		 * Represents the ratio of matches from a file location (matchCount / wordCount).
 		 */
@@ -338,7 +371,7 @@ public class InvertedIndex {
 		/**
 		 * Represents the file location that was searched.
 		 */
-		private String location;
+		private String location; // TODO final, this should not change
 
 		/**
 		 * Initializes instance data and calculates score.
@@ -354,6 +387,18 @@ public class InvertedIndex {
 			this.location = location;
 		}
 
+		/*
+		 * TODO Simplify constructor... let updaetMatchCount be the only way
+		 * to set the matchCount and score values.
+		 *
+		public QueryResult(String location) {
+		    this.location = location;
+		    this.matchCount = 0;
+		    etc.
+		}
+		 */
+
+		// TODO Remove
 		/**
 		 * Adds the matchCount from another QueryResult and recalculates the score.
 		 *
@@ -373,6 +418,18 @@ public class InvertedIndex {
 			setScore((double) this.matchCount / wordCount);
 		}
 
+		/*
+		 * TODO Move more of the work into updateMatchCount and then
+		 * make the method private.
+
+		private void updateMatchCount(String match) {
+			this.matchCount += invertedIndex.get(match).get(location).size();
+			this.score = (double) this.matchCount / wordCount.get(location);
+		}
+
+		 */
+
+		// TODO Remove
 		/**
 		 * Sets the score to a new value.
 		 *
@@ -382,6 +439,7 @@ public class InvertedIndex {
 			this.score = score;
 		}
 
+		// TODO Remove (going to better encapsulate these values)
 		/**
 		 * Sets the location to a new value.
 		 *
