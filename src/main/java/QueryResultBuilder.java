@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 /**
@@ -64,18 +65,6 @@ public class QueryResultBuilder {
 		}
 	}
 
-	// TODO Remove, if you need this call InvertedIndexBuilder.isTextFile instead
-	/**
-	 * This checks to see if a path leads to a text file.
-	 *
-	 * @param path file path to be checked
-	 * @return true if the path ends with the .txt or .text extension
-	 */
-	public static boolean isTextFile(Path path) {
-		String lower = path.toString().toLowerCase();
-		return lower.endsWith(".txt") || lower.endsWith(".text");
-	}
-
 	/**
 	 * Takes in a Path object and parses through the directory(s) and text file(s) within
 	 * them. Uses the queries within the files to search in the index passed into builder.
@@ -92,7 +81,7 @@ public class QueryResultBuilder {
 				if(Files.isDirectory(path)) {
 					readQueryFiles(path, exact);
 				}
-				else if(isTextFile(path)) {
+				else if(InvertedIndexBuilder.isTextFile(path)) {
 					readQueryFile(path, exact);
 				}
 			}
@@ -131,19 +120,22 @@ public class QueryResultBuilder {
 		var joined = String.join(" ", queries);
 
 		if (!queries.isEmpty() && !queryResult.containsKey(joined)) {
-			addResult(joined, index.search(queries, exact));
+			addResult(joined, queries, exact);
 		}
 	}
 
-	// TODO Make private? Breaks encapsulation if we can put any arbitrary results into the map.
+	private void addResult(String queryLine, Set<String> queries) {
+		addResult(queryLine, queries, false);
+	}
+	
 	/**
 	 * Adds a single query match result to queryResult.
 	 *
 	 * @param queryLine String of query search stems
 	 * @param results result of stem search from index
 	 */
-	public void addResult(String queryLine, List<InvertedIndex.QueryResult> results) {
-		queryResult.put(queryLine, results);
+	private void addResult(String queryLine, Set<String> queries, boolean exact) {
+		queryResult.put(queryLine, index.search(queries, exact));
 	}
 
 	/**
