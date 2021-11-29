@@ -104,8 +104,6 @@ public class InvertedIndex {
 	 *
 	 * @param elem query line to be parsed and matched to inverted index entries
 	 * @return the list of query search results
-	 * 
-	 * @see #updateResult(String, Map, List)
 	 */
 	public List<QueryResult> exactSearch(Set<String> elem) {
 		List<QueryResult> results = new ArrayList<>();
@@ -115,7 +113,7 @@ public class InvertedIndex {
 		for(String stem: elem) {
 			if(invertedIndex.containsKey(stem)) {
 				//For every entry under that stem
-				updateResult(stem, lookup, results);
+				addResult(stem, lookup, results);
 			}
 		}
 
@@ -129,8 +127,6 @@ public class InvertedIndex {
 	 *
 	 * @param elem query line to be parsed and matched to inverted index entries
 	 * @return the list of query search results
-	 * 
-	 * @see #updateResult(String, Map, List)
 	 */
 	public List<QueryResult> partialSearch(Set<String> elem) {
 		List<QueryResult> results = new ArrayList<>();
@@ -141,7 +137,7 @@ public class InvertedIndex {
 			//For every entry under that stem
 			for(String stemKey: invertedIndex.tailMap(stem).keySet()) {
 				if(stemKey.startsWith(stem)) {
-					updateResult(stemKey, lookup, results);
+					addResult(stemKey, lookup, results);
 				}
 				//No more stemKeys that start with stem, exit loop
 				else {
@@ -154,15 +150,9 @@ public class InvertedIndex {
 	}
 	
 	/**
-	 * Loops through the file locations where the stem key was found and either adds
-	 * a new queryResult to result list passed in function or updates the result
-	 * found in result list.
 	 * 
-	 * @param stem stem key to reference
-	 * @param lookup lookup map for existing QueryResults in result list
-	 * @param results list containing query results from query search
 	 */
-	private void updateResult(String stem, Map<String, QueryResult> lookup,
+	private void addResult(String stem, Map<String, QueryResult> lookup,
 			List<QueryResult> results) {
 		QueryResult queryResult = null;
 		
@@ -326,14 +316,13 @@ public class InvertedIndex {
 		 * Represents the ratio of matches from a file location (matchCount / wordCount).
 		 */
 		private double score;
-		
 		/**
 		 * Represents the file location that was searched.
 		 */
 		private final String location;
 
 		/**
-		 * Sets searched file and sets score and match count to 0.
+		 * Initializes instance data and calculates score.
 		 *
 		 * @param countMap total count of words from location
 		 * @param matchCount amount of stem matches from query
@@ -348,7 +337,7 @@ public class InvertedIndex {
 		/**
 		 * Sets matchCount to a new value and recalculates the score.
 		 *
-		 * @param stemMatch stem key to reference from invertedIndex
+		 * @param matchCount new value matchCount should be set to
 		 */
 		private void updateMatchCount(String stemMatch) {
 			this.matchCount += invertedIndex.get(stemMatch).get(location).size();
