@@ -156,7 +156,7 @@ public class IndexReadWriteLock {
 				log.catching(Level.DEBUG, ex);
 				Thread.currentThread().interrupt();
 			}
-			catch(ConcurrentModificationException ex) {
+			catch(ConcurrentModificationException ex) { // TODO Remove
 				log.catching(Level.DEBUG, ex);
 				Thread.currentThread().interrupt();
 			}
@@ -178,7 +178,7 @@ public class IndexReadWriteLock {
 				}
 				readers--;
 				log.debug("Released read lock.");
-				lock.notifyAll();
+				lock.notifyAll(); // TODO Over-notification, readers is 0
 			}
 		}
 	}
@@ -239,10 +239,11 @@ public class IndexReadWriteLock {
 					log.debug("Current thread is NOT active writer.");
 					throw new ConcurrentModificationException();
 				}
-			
+
 				writers--;
 				if(writers == 0) {
 					activeWriter = null;
+					// TODO lock.notifyAll();
 				}
 				log.debug("Released write lock.");
 				lock.notifyAll();

@@ -3,34 +3,36 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+// TODO https://github.com/usf-cs272-fall2021/lectures/blob/main/Synchronization/src/main/java/ConcurrentSet.java
+
 /**
  * This is a thread safe version of the inverted index, providing multithreading
  * functionality to the inverted index data structure.
  */
 public class ThreadSafeInvertedIndex extends InvertedIndex{
 	/** This will hold all of the tasks needed to be executed. */
-	WorkQueue queue;
-	
+	WorkQueue queue; // TODO Remove
+
 	/** This will be the read/wrie lock needed for multithreading. */
 	IndexReadWriteLock lock;
-	
+
 	/**
 	 * Default initialization of index, creates a new work queue.
 	 */
 	public ThreadSafeInvertedIndex() {
 		this(new WorkQueue());
 	}
-	
+
 	/**
 	 * Passes a work queue object to be used and initializes lock object.
-	 * 
+	 *
 	 * @param queue work queue to be passed into index for referencing
 	 */
 	public ThreadSafeInvertedIndex(WorkQueue queue) {
 		this.queue = queue;
 		lock = new IndexReadWriteLock();
 	}
-	
+
 	@Override
 	public boolean add(String word, String location, Integer position) {
 		synchronized(lock.writeLock()) {
