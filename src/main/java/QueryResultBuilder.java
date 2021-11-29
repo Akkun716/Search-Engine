@@ -113,7 +113,7 @@ public class QueryResultBuilder {
 	 * @param line query line from file to be read and possibly added
 	 * @param exact determines whether exact search should be performed
 	 *
-	 * @see #addResult(String, List)
+	 * @see #addResult(String, Set, boolean)
 	 */
 	public void readQueryLine(String line, boolean exact) {
 		var queries = TextStemmer.uniqueStems(line);
@@ -124,6 +124,14 @@ public class QueryResultBuilder {
 		}
 	}
 
+	/**
+	 * Adds a single query match result to queryResult.
+	 *
+	 * @param queryLine String of query search stems
+	 * @param queries set of queries to use for search
+	 * 
+	 * @see #addResult(String, Set, boolean)
+	 */
 	private void addResult(String queryLine, Set<String> queries) {
 		addResult(queryLine, queries, false);
 	}
@@ -132,7 +140,8 @@ public class QueryResultBuilder {
 	 * Adds a single query match result to queryResult.
 	 *
 	 * @param queryLine String of query search stems
-	 * @param results result of stem search from index
+	 * @param queries set of queries to use for search
+	 * @param exact determines whether exact search should be performed
 	 */
 	private void addResult(String queryLine, Set<String> queries, boolean exact) {
 		queryResult.put(queryLine, index.search(queries, exact));

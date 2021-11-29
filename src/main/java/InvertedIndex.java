@@ -113,7 +113,7 @@ public class InvertedIndex {
 		for(String stem: elem) {
 			if(invertedIndex.containsKey(stem)) {
 				//For every entry under that stem
-				addResult(stem, lookup, results);
+				updateResult(stem, lookup, results);
 			}
 		}
 
@@ -137,7 +137,7 @@ public class InvertedIndex {
 			//For every entry under that stem
 			for(String stemKey: invertedIndex.tailMap(stem).keySet()) {
 				if(stemKey.startsWith(stem)) {
-					addResult(stemKey, lookup, results);
+					updateResult(stemKey, lookup, results);
 				}
 				//No more stemKeys that start with stem, exit loop
 				else {
@@ -150,9 +150,15 @@ public class InvertedIndex {
 	}
 	
 	/**
+	 * Loops through the file locations where the stem key was found and either adds
+	 * a new queryResult to result list passed in function or updates the result
+	 * found in result list.
 	 * 
+	 * @param stem stem key to reference
+	 * @param lookup lookup map for existing QueryResults in result list
+	 * @param results list containing query results from query search
 	 */
-	private void addResult(String stem, Map<String, QueryResult> lookup,
+	private void updateResult(String stem, Map<String, QueryResult> lookup,
 			List<QueryResult> results) {
 		QueryResult queryResult = null;
 		
@@ -323,9 +329,7 @@ public class InvertedIndex {
 
 		/**
 		 * Initializes instance data and calculates score.
-		 *
-		 * @param countMap total count of words from location
-		 * @param matchCount amount of stem matches from query
+
 		 * @param location file location searched
 		 */
 		public QueryResult(String location) {
@@ -337,7 +341,7 @@ public class InvertedIndex {
 		/**
 		 * Sets matchCount to a new value and recalculates the score.
 		 *
-		 * @param matchCount new value matchCount should be set to
+		 * @param stemMatch stem key to be referenced
 		 */
 		private void updateMatchCount(String stemMatch) {
 			this.matchCount += invertedIndex.get(stemMatch).get(location).size();

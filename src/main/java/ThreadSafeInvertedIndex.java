@@ -3,14 +3,27 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * This is a thread safe version of the inverted index, providing multithreading
+ * functionality to the inverted index data structure.
+ */
 public class ThreadSafeInvertedIndex extends InvertedIndex{
+	/** This will hold all of the tasks needed to be executed. */
 	WorkQueue queue;
+	
+	/** This will be the read/wrie lock needed for multithreading. */
 	IndexReadWriteLock lock;
 	
+	/**
+	 * Default initialization of index, creates a new work queue.
+	 */
 	public ThreadSafeInvertedIndex() {
 		this(new WorkQueue());
 	}
 	
+	/**
+	 * Passes a work queue object to be used and initializes lock object.
+	 */
 	public ThreadSafeInvertedIndex(WorkQueue queue) {
 		this.queue = queue;
 		lock = new IndexReadWriteLock();
@@ -109,13 +122,11 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 
 	@Override
 	public void indexToJson(Path output) throws IOException {
-		// TODO Auto-generated method stub
 		super.indexToJson(output);
 	}
 
 	@Override
 	public void countToJson(Path output) throws IOException {
-		// TODO Auto-generated method stub
 		super.countToJson(output);
 	}
 }
