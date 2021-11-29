@@ -43,15 +43,6 @@ public class TextStemmer {
 		}
 	}
 
-	/*
-	 * TODO Instead of this in your Javadoc:
-	 * @see stemLine(String, Stemmer, Collection)
-	 * ...try this instead:
-	 * @see #stemLine(String, Stemmer, Collection)
-	 *
-	 * The # means it is referencing something in the current class
-	 * and will remove any Javadoc warnings in this class.
-	 */
 	/**
 	 * Parses each line into cleaned and stemmed words.
 	 *
@@ -59,7 +50,7 @@ public class TextStemmer {
 	 * @param stemmer the stemmer to use
 	 * @return a list of cleaned and stemmed words in parsed order
 	 *
-	 * @see stemLine(String, Stemmer, Collection)
+	 * @see #stemLine(String, Stemmer, Collection)
 	 */
 	public static List<String> listStems(String line, Stemmer stemmer) {
 		List<String> output = new ArrayList<>();
@@ -91,7 +82,7 @@ public class TextStemmer {
 	 *
 	 * @see SnowballStemmer
 	 * @see #ENGLISH
-	 * @see stemLine(String, Stemmer, Collection)
+	 * @see #stemLine(String, Stemmer, Collection)
 	 */
 	public static void bufferedStem(Path input, Collection<String> output) throws IOException {
 		try(BufferedReader br = Files.newBufferedReader(input)) {
@@ -111,7 +102,7 @@ public class TextStemmer {
 	 * @return a list of stems from file in parsed order
 	 * @throws IOException if unable to read or parse file
 	 *
-	 * @see bufferedStem(Path, Collection)
+	 * @see #bufferedStem(Path, Collection)
 	 */
 	public static List<String> listStems(Path input) throws IOException {
 		List<String> output = new ArrayList<>();
@@ -126,7 +117,7 @@ public class TextStemmer {
 	 * @param stemmer the stemmer to use
 	 * @return a sorted set of unique cleaned and stemmed words
 	 *
-	 * @see stemLine(String, Stemmer, Collection)
+	 * @see #stemLine(String, Stemmer, Collection)
 	 */
 	public static Set<String> uniqueStems(String line, Stemmer stemmer) {
 		Set<String> output = new TreeSet<>();
@@ -157,7 +148,7 @@ public class TextStemmer {
 	 * @return a sorted set of unique cleaned and stemmed words from file
 	 * @throws IOException if unable to read or parse file
 	 *
-	 * @see bufferedStem(Path, Collection)
+	 * @see #bufferedStem(Path, Collection)
 	 */
 	public static Set<String> uniqueStems(Path input) throws IOException {
 		Set<String> output = new TreeSet<>();
