@@ -24,14 +24,14 @@ public class InvertedIndex {
 	 * This WordCount map holds the word count of the files included in the
 	 * invertedIndex map.
 	 */
-	public final Map<String, Integer> wordCount;
+	public final Map<String, Integer> countMap;
 
 	/**
 	 * Initializes invertedIndex and wordCount to new empty TreeMap objects.
 	 */
 	public InvertedIndex() {
 		invertedIndex = new TreeMap<>();
-		wordCount = new TreeMap<>();
+		countMap = new TreeMap<>();
 	}
 
 	/**
@@ -47,9 +47,9 @@ public class InvertedIndex {
 		invertedIndex.putIfAbsent(word, new TreeMap<>());
 		invertedIndex.get(word).putIfAbsent(location, new TreeSet<Integer>());
 
-		// TODO if (wordCount.getOrDefault(location, 0) < position)
-		if(!wordCount.containsKey(location) || wordCount.get(location) < position) {
-			wordCount.put(location, position);
+
+		if(!countMap.containsKey(location) || countMap.getOrDefault(location, 0) < position) {
+			countMap.put(location, position);
 		}
 
 		return invertedIndex.get(word).get(location).add(position);
@@ -67,24 +67,9 @@ public class InvertedIndex {
 		for(String word: words) {
 			add(word, location, i++);
 		}
-		wordCount.put(location, i);
+		countMap.put(location, i);
 	}
 
-	// TODO Remove to fully encapsulate word counts
-	/**
-	 * Adds the word count of a file to the wordCount map.
-	 *
-	 * @param location file location being referenced
-	 * @param count the word count of the file location
-	 * @return true if the count param changes the stored value in wordCount
-	 */
-	public boolean addWordCount(String location, Integer count) {
-		return count > 0
-				? setWordCount(location, count)
-				: false;
-	}
-
-//TODO Make private to fully encapsulate word counts
 	/**
 	 * Sets a word count value to a file location key.
 	 *
@@ -92,11 +77,11 @@ public class InvertedIndex {
 	 * @param count word count of referenced file
 	 * @return true if the map is updated with new (or changed) key value pair
 	 */
-	public boolean setWordCount(String location, Integer count) {
-		if(wordCount.containsKey(location) && wordCount.get(location) == count) {
+	private boolean setWordCount(String location, Integer count) {
+		if(countMap.containsKey(location) && countMap.get(location) == count) {
 				return false;
 		}
-		wordCount.put(location, count);
+		countMap.put(location, count);
 		return true;
 	}
 
@@ -119,55 +104,18 @@ public class InvertedIndex {
 	 *
 	 * @param elem query line to be parsed and matched to inverted index entries
 	 * @return the list of query search results
+	 * 
+	 * @see #updateResult(String, Map, List)
 	 */
 	public List<QueryResult> exactSearch(Set<String> elem) {
 		List<QueryResult> results = new ArrayList<>();
 		Map<String, QueryResult> lookup = new TreeMap<>();
-		QueryResult queryResult = null;
-
-		int occurrence;
 
 		//For each stem in query set elem
 		for(String stem: elem) {
 			if(invertedIndex.containsKey(stem)) {
 				//For every entry under that stem
-				for(String fileLocation: invertedIndex.get(stem).keySet()) {
-					occurrence = invertedIndex.get(stem).get(fileLocation).size();
-
-					if (lookup.containsKey(fileLocation)) {
-						queryResult = lookup.get(fileLocation);
-						/*
-						 * TODO Make this logic more reusable by moving the call
-						 * invertedIndex.get(stem).get(fileLocation).size();
-						 *
-						 * ...into updateMatchCount. See QueryResult for more.
-						 */
-						queryResult.updateMatchCount(queryResult.getMatchCount() + occurrence);
-					}
-					else {
-						QueryResult result = new QueryResult(wordCount.get(fileLocation), occurrence, fileLocation);
-						results.add(result);
-						lookup.put(fileLocation, result);
-					}
-
-					/* TODO After moving more work into QueryREsult and better encapsulating:
-
-					...first get the result
-					queryResult = lookup.get(fileLocation);
-
-					...if the result was null, create a new result and add to data structures
-					if (queryResult == null) {
-						QueryResult result = new QueryResult(fileLocation);
-						results.add(result);
-						lookup.put(fileLocation, result);
-					}
-
-					...always have a valid result by this point
-					...go ahead and update the match and score
-					queryResult.updateMatchCount(stem);
-					 */
-
-				}
+				updateResult(stem, lookup, results);
 			}
 		}
 
@@ -181,34 +129,19 @@ public class InvertedIndex {
 	 *
 	 * @param elem query line to be parsed and matched to inverted index entries
 	 * @return the list of query search results
+	 * 
+	 * @see #updateResult(String, Map, List)
 	 */
 	public List<QueryResult> partialSearch(Set<String> elem) {
 		List<QueryResult> results = new ArrayList<>();
 		Map<String, QueryResult> lookup = new TreeMap<>();
-		QueryResult queryResult = null;
-		int occurrence;
+
 		//For every stem in query
 		for(String stem: elem) {
 			//For every entry under that stem
 			for(String stemKey: invertedIndex.tailMap(stem).keySet()) {
 				if(stemKey.startsWith(stem)) {
-					/*
-					 * TODO This loop below is duplicate logic... move into a private
-					 * search helper and then call that helper method in both exact and
-					 * partial search!
-					 */
-					for(String fileLocation: invertedIndex.get(stemKey).keySet()) {
-						occurrence = invertedIndex.get(stemKey).get(fileLocation).size();
-						if (lookup.containsKey(fileLocation)) {
-							queryResult = lookup.get(fileLocation);
-							queryResult.updateMatchCount(queryResult.getMatchCount() + occurrence);
-						}
-						else {
-							QueryResult result = new QueryResult(wordCount.get(fileLocation), occurrence, fileLocation);
-							results.add(result);
-							lookup.put(fileLocation, result);
-						}
-					}
+					updateResult(stemKey, lookup, results);
 				}
 				//No more stemKeys that start with stem, exit loop
 				else {
@@ -218,6 +151,34 @@ public class InvertedIndex {
 		}
 		Collections.sort(results);
 		return results;
+	}
+	
+	/**
+	 * Loops through the file locations where the stem key was found and either adds
+	 * a new queryResult to result list passed in function or updates the result
+	 * found in result list.
+	 * 
+	 * @param stem stem key to reference
+	 * @param lookup lookup map for existing QueryResults in result list
+	 * @param results list containing query results from query search
+	 */
+	private void updateResult(String stem, Map<String, QueryResult> lookup,
+			List<QueryResult> results) {
+		QueryResult queryResult = null;
+		
+		for(String fileLocation: invertedIndex.get(stem).keySet()) {
+			queryResult = lookup.get(fileLocation);
+			if (queryResult == null) {
+				queryResult = new QueryResult(fileLocation);
+				queryResult.updateMatchCount(stem);
+				results.add(queryResult);
+				lookup.put(fileLocation, queryResult);
+			}
+			else {
+				queryResult.updateMatchCount(stem);
+			}
+		}
+		
 	}
 
 	/**
@@ -349,7 +310,7 @@ public class InvertedIndex {
 	 * @throws IOException file is invalid or can not be found
 	 */
 	public void countToJson(Path output) throws IOException {
-			JsonWriter.asObject(wordCount, output);
+			JsonWriter.asObject(countMap, output);
 	}
 
 	/**
@@ -360,93 +321,38 @@ public class InvertedIndex {
 		 * Represents the number of matches found in invertedIndex.
 		 */
 		private Integer matchCount;
-		/**
-		 * Represents the number of words found from file location in invertedIndex.
-		 */
-		private Integer wordCount; // TODO Remove, access wordCount map member directly instead
+
 		/**
 		 * Represents the ratio of matches from a file location (matchCount / wordCount).
 		 */
 		private double score;
+		
 		/**
 		 * Represents the file location that was searched.
 		 */
-		private String location; // TODO final, this should not change
+		private final String location;
 
 		/**
-		 * Initializes instance data and calculates score.
+		 * Sets searched file and sets score and match count to 0.
 		 *
-		 * @param wordCount total count of words from location
+		 * @param countMap total count of words from location
 		 * @param matchCount amount of stem matches from query
 		 * @param location file location searched
 		 */
-		public QueryResult(int wordCount, int matchCount, String location) {
-			this.matchCount = matchCount;
-			this.wordCount = wordCount;
-			score = ((double) matchCount) / wordCount;
-			this.location = location;
-		}
-
-		/*
-		 * TODO Simplify constructor... let updaetMatchCount be the only way
-		 * to set the matchCount and score values.
-		 *
 		public QueryResult(String location) {
-		    this.location = location;
-		    this.matchCount = 0;
-		    etc.
-		}
-		 */
-
-		// TODO Remove
-		/**
-		 * Adds the matchCount from another QueryResult and recalculates the score.
-		 *
-		 * @param result QueryResult to be absorbed
-		 */
-		public void combine(QueryResult result) {
-			updateMatchCount(matchCount + result.matchCount);
+			this.location = location;
+			this.matchCount = 0;
+			score = 0;
 		}
 
 		/**
 		 * Sets matchCount to a new value and recalculates the score.
 		 *
-		 * @param matchCount new value matchCount should be set to
+		 * @param stemMatch stem key to reference from invertedIndex
 		 */
-		public void updateMatchCount(int matchCount) {
-			this.matchCount = matchCount;
-			setScore((double) this.matchCount / wordCount);
-		}
-
-		/*
-		 * TODO Move more of the work into updateMatchCount and then
-		 * make the method private.
-
-		private void updateMatchCount(String match) {
-			this.matchCount += invertedIndex.get(match).get(location).size();
-			this.score = (double) this.matchCount / wordCount.get(location);
-		}
-
-		 */
-
-		// TODO Remove
-		/**
-		 * Sets the score to a new value.
-		 *
-		 * @param score new value score should be set to
-		 */
-		public void setScore(double score) {
-			this.score = score;
-		}
-
-		// TODO Remove (going to better encapsulate these values)
-		/**
-		 * Sets the location to a new value.
-		 *
-		 * @param location new String location should be set to
-		 */
-		public void setLocation(String location) {
-			this.location = location;
+		private void updateMatchCount(String stemMatch) {
+			this.matchCount += invertedIndex.get(stemMatch).get(location).size();
+			this.score = (double) this.matchCount / countMap.get(location);
 		}
 
 		/**
