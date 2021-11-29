@@ -23,6 +23,8 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	
 	/**
 	 * Passes a work queue object to be used and initializes lock object.
+	 * 
+	 * @param queue work queue to be passed into index for referencing
 	 */
 	public ThreadSafeInvertedIndex(WorkQueue queue) {
 		this.queue = queue;
