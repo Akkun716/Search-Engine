@@ -2,6 +2,28 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 
+/*
+ * TODO Focus first on passing 3a with these changes...
+ * Maybe even create another v3.0.x release to make sure it passes on Github.
+ *
+ * Reach out on Piazza with 1 question at a time:
+ * 1. Did you make the data structure thread safe properly?
+ * 2. Ask how to make build faster.
+ * 3. Ask how to make search faster.
+ */
+
+/*
+ * TODO Create a new multithreaded inverted index builder and multithreaded
+ * query result builder classes---those are the ones that should have access
+ * to a work queue.
+ *
+ * For building, readFile(Path path, InvertedIndex invertedIndex) is what
+ * a single "task" looks like.
+ *
+ * For searching, readQueryLine(String line, boolean exact) is what a single
+ * "task" looks like.
+ */
+
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
@@ -39,7 +61,7 @@ public class Driver {
 		else {
 			index = new InvertedIndex();
 		}
-		
+
 		InvertedIndexBuilder indexBuilder = new InvertedIndexBuilder(index);
 		QueryResultBuilder queryBuilder = new QueryResultBuilder(index);
 

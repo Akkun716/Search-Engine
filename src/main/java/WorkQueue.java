@@ -75,12 +75,19 @@ public class WorkQueue {
 	 * @param task work request (in the form of a {@link Runnable} object)
 	 */
 	public void execute(Runnable task) {
+		// TODO incrementPending here
 		synchronized (tasks) {
 			tasks.addLast(task);
 			pending++;
 			tasks.notifyAll();
 		}
 	}
+
+	/*
+	 * TODO
+	 * Copy/paste the increment, decrement, and finish methods from lecture code
+	 * https://github.com/usf-cs272-fall2021/lectures/blob/4b620b104551df5be82afa995982e03426b8523e/WorkQueues/src/main/java/WorkQueueDirectoryListing.java#L136-L165
+	 */
 
 	/**
 	 * Waits for all pending work (or tasks) to be finished. Does not terminate the
@@ -91,7 +98,7 @@ public class WorkQueue {
 			synchronized(tasks) {
 				tasks.notifyAll();
 			}
-			
+
 		}
 	}
 
@@ -140,10 +147,10 @@ public class WorkQueue {
 	public int size() {
 		return workers.length;
 	}
-	
+
 	/**
 	 * Returns the amount of remaining tasks to be executed.
-	 * 
+	 *
 	 * @return number of remaining tasks in work queue
 	 */
 	public int remaining() {
@@ -189,7 +196,7 @@ public class WorkQueue {
 						}
 						else {
 							task = tasks.removeFirst();
-							pending--;
+							pending--; // TODO remove
 						}
 					}
 
@@ -202,6 +209,7 @@ public class WorkQueue {
 						System.err.printf("Warning: Worker thread %s encountered an exception while running.%n", this.getName());
 						log.catching(Level.DEBUG, e);
 					}
+					// TODO finally { decrementPending here }
 				}
 			}
 			catch (InterruptedException e) {
