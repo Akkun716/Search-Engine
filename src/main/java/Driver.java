@@ -46,6 +46,8 @@ public class Driver {
 
 		ArgumentMap map = new ArgumentMap(args);
 		InvertedIndex index;
+		InvertedIndexBuilder indexBuilder;
+		QueryResultBuilder queryBuilder;
 
 		if(map.hasFlag("-threads")) {
 			WorkQueue queue;
@@ -56,14 +58,15 @@ public class Driver {
 			else {
 				queue = new WorkQueue(threads);
 			}
-			index = new ThreadSafeInvertedIndex(queue);
+			index = new ThreadSafeInvertedIndex();
+			indexBuilder = new ThreadSafeIndexBuilder(index, queue);
+			queryBuilder = new ThreadSafeQueryBuilder(index, queue);
 		}
 		else {
 			index = new InvertedIndex();
+			indexBuilder = new InvertedIndexBuilder(index);
+			queryBuilder = new QueryResultBuilder(index);
 		}
-
-		InvertedIndexBuilder indexBuilder = new InvertedIndexBuilder(index);
-		QueryResultBuilder queryBuilder = new QueryResultBuilder(index);
 
 		if(map.hasFlag("-text")) {
 			Path input = map.getPath("-text");
