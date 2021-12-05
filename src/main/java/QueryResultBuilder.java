@@ -143,8 +143,18 @@ public class QueryResultBuilder {
 	 * @param queries set of queries to use for search
 	 * @param exact determines whether exact search should be performed
 	 */
-	private void addResult(String queryLine, Set<String> queries, boolean exact) {
+	protected void addResult(String queryLine, Set<String> queries, boolean exact) {
 		queryResult.put(queryLine, index.search(queries, exact));
+	}
+	
+	/**
+	 * Determines if queryResult map contains the passed key.
+	 * 
+	 * @param queryKey key to search in queryResult
+	 * @return true if queryKey exists as key in queryResult
+	 */
+	public boolean containsResult(String queryKey) {
+		return queryResult.containsKey(queryKey);
 	}
 
 	/**
