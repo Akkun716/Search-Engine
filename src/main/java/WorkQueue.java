@@ -75,32 +75,61 @@ public class WorkQueue {
 	 * @param task work request (in the form of a {@link Runnable} object)
 	 */
 	public void execute(Runnable task) {
-		// TODO incrementPending here
+		incrementPending();
 		synchronized (tasks) {
 			tasks.addLast(task);
-			pending++;
 			tasks.notifyAll();
 		}
 	}
 
-	/*
-	 * TODO
-	 * Copy/paste the increment, decrement, and finish methods from lecture code
-	 * https://github.com/usf-cs272-fall2021/lectures/blob/4b620b104551df5be82afa995982e03426b8523e/WorkQueues/src/main/java/WorkQueueDirectoryListing.java#L136-L165
+	/**
+	 * Rather than having threads wait for each other (undoing our multithreading),
+	 * we will wait until all pending work is completed.
+	 *
+	 * @throws InterruptedException from {@link Thread#wait()}
 	 */
+	private synchronized void finish() throws InterruptedException {
+		log.debug("Waiting for work...");
+
+		while (pending > 0) {
+			this.wait();
+			log.debug("Woke up with pending at {}.", pending);
+		}
+
+		log.debug("Work finished.");
+	}
 
 	/**
-	 * Waits for all pending work (or tasks) to be finished. Does not terminate the
-	 * worker threads so that the work queue can continue to be used.
+	 * Safely increments the shared pending variable.
 	 */
-	public synchronized void finish() {
-		while(pending > 0) {
-			synchronized(tasks) {
-				tasks.notifyAll();
-			}
+	private synchronized void incrementPending() {
+		pending++;
+	}
 
+	/**
+	 * Safely decrements the shared pending variable, and wakes up any threads
+	 * waiting for work to be completed.
+	 */
+	private synchronized void decrementPending() {
+		assert pending > 0;
+		pending--;
+
+		if (pending == 0) {
+			this.notifyAll();
 		}
 	}
+	
+//	/**
+//	 * Waits for all pending work (or tasks) to be finished. Does not terminate the
+//	 * worker threads so that the work queue can continue to be used.
+//	 */
+//	public synchronized void finish() {
+//		while(pending > 0) {
+//			synchronized(tasks) {
+//				tasks.notifyAll();
+//			}
+//		}
+//	}
 
 	/**
 	 * Asks the queue to shutdown. Any unprocessed work (or tasks) will not be
@@ -196,7 +225,6 @@ public class WorkQueue {
 						}
 						else {
 							task = tasks.removeFirst();
-							pending--; // TODO remove
 						}
 					}
 
@@ -209,7 +237,9 @@ public class WorkQueue {
 						System.err.printf("Warning: Worker thread %s encountered an exception while running.%n", this.getName());
 						log.catching(Level.DEBUG, e);
 					}
-					// TODO finally { decrementPending here }
+					finally {
+						decrementPending();
+					}
 				}
 			}
 			catch (InterruptedException e) {
