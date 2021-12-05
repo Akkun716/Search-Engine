@@ -10,127 +10,194 @@ import java.util.Set;
  * functionality to the inverted index data structure.
  */
 public class ThreadSafeInvertedIndex extends InvertedIndex{
-	/** This will hold all of the tasks needed to be executed. */
-	WorkQueue queue; // TODO Remove
 
-	/** This will be the read/wrie lock needed for multithreading. */
+	/** This will be the read/write lock needed for multithreading. */
 	IndexReadWriteLock lock;
 
 	/**
-	 * Default initialization of index, creates a new work queue.
+	 * Initialization of index and initializes lock object.
 	 */
 	public ThreadSafeInvertedIndex() {
-		this(new WorkQueue());
-	}
-
-	/**
-	 * Passes a work queue object to be used and initializes lock object.
-	 *
-	 * @param queue work queue to be passed into index for referencing
-	 */
-	public ThreadSafeInvertedIndex(WorkQueue queue) {
-		this.queue = queue;
 		lock = new IndexReadWriteLock();
 	}
 
 	@Override
 	public boolean add(String word, String location, Integer position) {
-		synchronized(lock.writeLock()) {
+		lock.writeLock().lock();
+		
+		try {
 			return super.add(word, location, position);
+		}
+		finally {
+			lock.writeLock().unlock();
 		}
 	}
 
 	@Override
 	public List<QueryResult> exactSearch(Set<String> elem) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.exactSearch(elem);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public List<QueryResult> partialSearch(Set<String> elem) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.partialSearch(elem);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public Set<String> getWords() {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.getWords();
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public Set<String> getLocations(String stem) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.getLocations(stem);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public Set<Object> getPositions(String stem, String location) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.getPositions(stem, location);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public boolean hasStem(String stem) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.hasStem(stem);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public boolean hasLocation(String stem, String location) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.hasLocation(stem, location);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public boolean hasPosition(String stem, String location, Integer position) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.hasPosition(stem, location, position);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public int stemCount() {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.stemCount();
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public int locationCount(String stem) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.locationCount(stem);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public int positionCount(String stem, String location) {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.positionCount(stem, location);
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public String toString() {
-		synchronized(lock.readLock()) {
+		lock.readLock().lock();
+		
+		try {
 			return super.toString();
+		}
+		finally {
+			lock.readLock().unlock();
 		}
 	}
 
 	@Override
 	public void indexToJson(Path output) throws IOException {
-		super.indexToJson(output);
+		lock.readLock().lock();
+		
+		try {
+			super.indexToJson(output);
+		}
+		finally {
+			lock.readLock().unlock();
+		}
 	}
 
 	@Override
 	public void countToJson(Path output) throws IOException {
-		super.countToJson(output);
+		lock.readLock().lock();
+		
+		try {
+			super.countToJson(output);
+		}
+		finally {
+			lock.readLock().unlock();
+		}
 	}
 }
