@@ -17,7 +17,7 @@ public class InvertedIndexBuilder {
 	/**
 	 * This InvertedIndex will be a reference for the index passed into the function.
 	 */
-	private final InvertedIndex invertedIndex;
+	protected final InvertedIndex invertedIndex;
 
 	/**
 	 * Passes an invertedIndex into the class to be altered.
