@@ -88,7 +88,7 @@ public class WorkQueue {
 	 *
 	 * @throws InterruptedException from {@link Thread#wait()}
 	 */
-	private synchronized void finish() throws InterruptedException {
+	protected synchronized void finish() throws InterruptedException {
 		log.debug("Waiting for work...");
 
 		while (pending > 0) {
