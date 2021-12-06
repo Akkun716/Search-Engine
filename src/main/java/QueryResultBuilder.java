@@ -8,6 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 /**
  * This class builds a list of queries from file reading as well as storing
  * query search results by an InvertedIndex (stored in a Map).
@@ -22,6 +25,9 @@ public class QueryResultBuilder {
 	 * This InvertedIndex will be a reference for the index passed into the function.
 	 */
 	private final InvertedIndex index;
+	
+	/** The log4j2 logger. */
+	protected static final Logger log = LogManager.getLogger();
 
 	/**
 	 * Initializes the queryResult and queryList instance members to a new

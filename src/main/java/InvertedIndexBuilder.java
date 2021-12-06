@@ -4,6 +4,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
@@ -18,6 +21,9 @@ public class InvertedIndexBuilder {
 	 * This InvertedIndex will be a reference for the index passed into the function.
 	 */
 	protected final InvertedIndex invertedIndex;
+	
+	/** The log4j2 logger. */
+	protected static final Logger log = LogManager.getLogger();
 
 	/**
 	 * Passes an invertedIndex into the class to be altered.
