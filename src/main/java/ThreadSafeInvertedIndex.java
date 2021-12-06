@@ -3,8 +3,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Set;
 
-// TODO https://github.com/usf-cs272-fall2021/lectures/blob/main/Synchronization/src/main/java/ConcurrentSet.java
-
 /**
  * This is a thread safe version of the inverted index, providing multithreading
  * functionality to the inverted index data structure.

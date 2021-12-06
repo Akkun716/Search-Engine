@@ -23,9 +23,6 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 	 */
 	private final WorkQueue queue;
 	
-	/** The log4j2 logger. */
-	protected static final Logger log = LogManager.getLogger();
-	
 	/**
 	 * Passes an invertedIndex into the class to be altered.
 	 *
@@ -49,7 +46,9 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 		try {
 			queue.finish();
 		}
-		catch(InterruptedException e) {}
+		catch(InterruptedException e) {
+			log.debug("An Interruption error was thrown and needs to be handled.");
+		}
 	}
 
 	/**
