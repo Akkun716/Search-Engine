@@ -40,6 +40,17 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 	public void readFile(Path path) throws IOException {
 		readFile(path, this.invertedIndex, this.queue);
 	}
+	
+	
+
+	@Override
+	public void build(Path mainPath) throws IOException {
+		super.build(mainPath);
+		try {
+			queue.finish();
+		}
+		catch(InterruptedException e) {}
+	}
 
 	/**
 	 * Reads the file path into the specified invertedIndex. 

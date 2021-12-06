@@ -37,6 +37,15 @@ public class ThreadSafeQueryBuilder extends QueryResultBuilder{
 	public void readQueryLine(String line, boolean exact) {
 		queue.execute(new Task(line, exact));
 	}
+	
+	@Override
+	public void build(Path mainPath, boolean exact) throws IOException {
+		super.build(mainPath, exact);
+		try {
+			queue.finish();
+		}
+		catch(InterruptedException e) {}
+	}
 
 //	/**
 //	 * Adds a single query match result to queryResult.
