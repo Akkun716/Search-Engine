@@ -44,7 +44,9 @@ public class ThreadSafeQueryBuilder extends QueryResultBuilder{
 		try {
 			queue.finish();
 		}
-		catch(InterruptedException e) {}
+		catch(InterruptedException e) {
+			log.debug("An Interruption error was thrown and needs to be handled.");
+		}
 	}
 
 //	/**
