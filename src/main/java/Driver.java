@@ -12,18 +12,6 @@ import java.time.Instant;
  * 3. Ask how to make search faster.
  */
 
-/*
- * TODO Create a new multithreaded inverted index builder and multithreaded
- * query result builder classes---those are the ones that should have access
- * to a work queue.
- *
- * For building, readFile(Path path, InvertedIndex invertedIndex) is what
- * a single "task" looks like.
- *
- * For searching, readQueryLine(String line, boolean exact) is what a single
- * "task" looks like.
- */
-
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
