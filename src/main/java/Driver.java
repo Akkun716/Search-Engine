@@ -36,9 +36,10 @@ public class Driver {
 		InvertedIndex index;
 		InvertedIndexBuilder indexBuilder;
 		QueryResultBuilder queryBuilder;
+		WorkQueue queue = null;
+		Path input, output;
 
 		if(map.hasFlag("-threads")) {
-			WorkQueue queue;
 			Integer threads = map.getInteger(null);
 			if(threads == null || threads <= 0) {
 				queue = new WorkQueue();
@@ -57,7 +58,7 @@ public class Driver {
 		}
 
 		if(map.hasFlag("-text")) {
-			Path input = map.getPath("-text");
+			input = map.getPath("-text");
 			try {
 				indexBuilder.build(input);
 			}
@@ -72,7 +73,7 @@ public class Driver {
 		}
 
 		if(map.hasFlag("-query") && map.getPath("-query") != null) {
-			Path input = map.getPath("-query");
+			input = map.getPath("-query");
 			try {
 				queryBuilder.build(input, map.hasFlag("-exact"));
 			}
@@ -82,7 +83,7 @@ public class Driver {
 		}
 
 		if(map.hasFlag("-results")) {
-			Path output = map.getPath("-results", Path.of("results.json"));
+			output = map.getPath("-results", Path.of("results.json"));
 			try {
 				queryBuilder.resultToJson(output);
 			}
@@ -92,7 +93,7 @@ public class Driver {
 		}
 
 		if(map.hasFlag("-counts")) {
-			Path output = map.getPath("-counts", Path.of("counts.json"));
+			output = map.getPath("-counts", Path.of("counts.json"));
 			try {
 				index.countToJson(output);
 			}
@@ -102,13 +103,17 @@ public class Driver {
 		}
 
 		if(map.hasFlag("-index")) {
-			Path output = map.getPath("-index", Path.of("index.json"));
+			output = map.getPath("-index", Path.of("index.json"));
 			try {
 				index.indexToJson(output);
 			}
 			catch(Exception e) {
 				System.out.println("Unable to write out to file: " + output.toString());
 			}
+		}
+		
+		if(queue != null) {
+			queue.shutdown();
 		}
 
 		// calculate time elapsed and output
