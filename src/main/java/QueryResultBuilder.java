@@ -19,12 +19,12 @@ public class QueryResultBuilder {
 	/**
 	 * This QueryResult map holds lists of queryResults for each query line key.
 	 */
-	private final Map<String, List<InvertedIndex.QueryResult>> queryResult;
+	protected final Map<String, List<InvertedIndex.QueryResult>> queryResult;
 
 	/**
 	 * This InvertedIndex will be a reference for the index passed into the function.
 	 */
-	private final InvertedIndex index;
+	protected final InvertedIndex index;
 	
 	/** The log4j2 logger. */
 	protected static final Logger log = LogManager.getLogger();
