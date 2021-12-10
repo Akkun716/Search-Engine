@@ -1,6 +1,8 @@
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -18,7 +20,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	public ThreadSafeInvertedIndex() {
 		lock = new IndexReadWriteLock();
 	}
-
+	
 	@Override
 	public boolean add(String word, String location, Integer position) {
 		lock.writeLock().lock();
@@ -80,7 +82,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	}
 
 	@Override
-	public Set<Object> getPositions(String stem, String location) {
+	public Set<Integer> getPositions(String stem, String location) {
 		lock.readLock().lock();
 		
 		try {
