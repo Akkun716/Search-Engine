@@ -18,7 +18,7 @@ public class InvertedIndex {
 	 * keys which are then paired to an array of positions in the file the word
 	 * stem appeared.
 	 */
-	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
+	protected final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 
 	/**
 	 * This WordCount map holds the word count of the files included in the
@@ -68,6 +68,42 @@ public class InvertedIndex {
 			add(word, location, i++);
 		}
 		countMap.put(location, i);
+	}
+	
+	/**
+	 * Adds all elements from the inverted index passed into function.
+	 * 
+	 * @param index inverted index to be read from
+	 */
+	public void addAll(InvertedIndex index) {
+		for(String word : index.getWords()) {
+			addAllLocations(index, word);
+		}
+	}
+	
+	/**
+	 * Adds all of the integer positions of a stem at a location.
+	 * 
+	 * @param index index to be read from
+	 * @param word stemmed word
+	 */
+	public void addAllLocations(InvertedIndex index, String word) {
+		for(String location : index.getLocations(word)) {
+			addAllPositions(index, word, location);
+		}
+	}
+	
+	/**
+	 * Adds all of the integer positions of a stem at a location.
+	 * 
+	 * @param index index to be read from
+	 * @param word stemmed word
+	 * @param location file location where the word stem appeared
+	 */
+	public void addAllPositions(InvertedIndex index, String word, String location) {
+		for(Integer position : index.getPositions(word, location)) {
+			add(word, location, position);
+		}
 	}
 
 	/**
@@ -174,7 +210,6 @@ public class InvertedIndex {
 				queryResult.updateMatchCount(stem);
 			}
 		}
-		
 	}
 
 	/**
@@ -206,7 +241,7 @@ public class InvertedIndex {
 	 * @param location file location that needs to be accessed
 	 * @return an unmodifiable Set of positions
 	 */
-	public Set<Object> getPositions(String stem, String location) {
+	public Set<Integer> getPositions(String stem, String location) {
 		return hasLocation(stem, location)
 				? Collections.unmodifiableSet(invertedIndex.get(stem).get(location))
 				: Collections.emptySet();
