@@ -74,20 +74,15 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 
 		@Override
 		public void run() {
-			synchronized(index) {
-				try(BufferedReader br = Files.newBufferedReader(path)) {
-					Stemmer stemmer = new SnowballStemmer(TextStemmer.ENGLISH);
-					String line, pathString = path.toString();
-					int i = 1;
-					while((line = br.readLine()) != null) {
-						for(String word: TextParser.parse(line)) {
-							index.add(stemmer.stem(word).toString(), pathString, i++);
-						}
-					}
+			InvertedIndex tempIndex = new InvertedIndex();
+			try{
+				InvertedIndexBuilder.readFile(path, tempIndex);
+				synchronized(index) {
+					index.addAll(tempIndex);
 				}
-				catch(IOException e) {
+			}
+			catch(IOException e) {
 					log.debug("An IO error was thrown and needs to be handled.");
-				}
 			}
 		}
 	}
