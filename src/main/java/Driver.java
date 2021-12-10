@@ -113,7 +113,7 @@ public class Driver {
 		}
 		
 		if(queue != null) {
-			queue.shutdown();
+			queue.join();
 		}
 
 		// calculate time elapsed and output
