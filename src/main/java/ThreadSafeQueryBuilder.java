@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,40 +49,14 @@ public class ThreadSafeQueryBuilder extends QueryResultBuilder{
 			log.debug("An Interruption error was thrown and needs to be handled.");
 		}
 	}
-
-//	/**
-//	 * Adds a single query match result to queryResult.
-//	 *
-//	 * @param queryLine String of query search stems
-//	 * @param queries set of queries to use for search
-//	 * 
-//	 * @see #addResult(String, Set, boolean)
-//	 */
-//	private void addResult(String queryLine, Set<String> queries) {
-//		addResult(queryLine, queries, false);
-//	}
-//	
-//	/**
-//	 * Adds a single query match result to queryResult.
-//	 *
-//	 * @param queryLine String of query search stems
-//	 * @param queries set of queries to use for search
-//	 * @param exact determines whether exact search should be performed
-//	 */
-//	private void addResult(String queryLine, Set<String> queries, boolean exact) {
-//		queryResult.put(queryLine, index.search(queries, exact));
-//	}
-//
-//	/**
-//	 * Utilizes the JsonWriter class and writes out queryResult in JSON format out
-//	 * to output file.
-//	 *
-//	 * @param output path to the output file
-//	 * @throws IOException file is invalid or can not be found
-//	 */
-//	public void resultToJson(Path output) throws IOException {
-//			JsonWriter.asResult(queryResult, output);
-//	}
+	
+	@Override
+	protected void addResult(String queryLine, Set<String> queries, boolean exact) {
+		List<InvertedIndex.QueryResult> tempList = index.search(queries, exact);
+		synchronized(queryResult) {
+			queryResult.put(queryLine, tempList);
+		}
+	}
 	
 	public class Task implements Runnable {
 		String fileLine;
