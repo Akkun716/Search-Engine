@@ -1,16 +1,7 @@
+import java.net.URL;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
-
-/*
- * TODO Focus first on passing 3a with these changes...
- * Maybe even create another v3.0.x release to make sure it passes on Github.
- *
- * Reach out on Piazza with 1 question at a time:
- * 1. Did you make the data structure thread safe properly?
- * 2. Ask how to make build faster.
- * 3. Ask how to make search faster.
- */
 
 /**
  * Class responsible for running this project based on the provided command-line
@@ -39,6 +30,8 @@ public class Driver {
 		WorkQueue queue = null;
 		Path input, output;
 
+		
+		
 		if(map.hasFlag("-threads")) {
 			Integer threads = map.getInteger(null);
 			if(threads == null || threads <= 0) {
@@ -57,6 +50,22 @@ public class Driver {
 			queryBuilder = new QueryResultBuilder(index);
 		}
 
+		if(map.hasFlag("-html")) {
+			String url = map.getString("-html");
+			try {
+				indexBuilder = new WebCrawlerBuilder(index, queue);
+//				indexBuilder.build(url);
+			}
+			catch(Exception e) {
+				if(url == null) {
+					System.out.println("Unable to build the inverted index from unreadable url");
+				}
+				else {
+					System.out.println("Unable to build the inverted index from url: " + url.toString());
+				}
+			}
+		}
+		
 		if(map.hasFlag("-text")) {
 			input = map.getPath("-text");
 			try {

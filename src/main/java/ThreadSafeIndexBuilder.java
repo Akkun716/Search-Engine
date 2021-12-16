@@ -12,8 +12,7 @@ import opennlp.tools.stemmer.Stemmer;
 import opennlp.tools.stemmer.snowball.SnowballStemmer;
 
 /**
- * This class holds word stems and all of the files and positions within those
- * files they have been found in.
+ * This class takes in an inverted index and populates it in a multithreaded way.
  *
  * @author Adon Anglon
  */
