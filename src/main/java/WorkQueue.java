@@ -88,13 +88,20 @@ public class WorkQueue {
 	 *
 	 * @throws InterruptedException from {@link Thread#wait()}
 	 */
-	protected synchronized void finish() throws InterruptedException {
+	protected synchronized void finish() throws InterruptedException { // TODO public
 		log.debug("Waiting for work...");
 
 		while (pending > 0) {
 			this.wait();
 			log.debug("Woke up with pending at {}.", pending);
 		}
+
+		/*
+		 * TODO
+		 * try { while... }
+		 * catch (InterruptedException) { Thread.currentThread().interrupt(); }
+		 *
+		 */
 
 		log.debug("Work finished.");
 	}
@@ -118,7 +125,8 @@ public class WorkQueue {
 			this.notifyAll();
 		}
 	}
-	
+
+	// TODO Cleanup
 //	/**
 //	 * Waits for all pending work (or tasks) to be finished. Does not terminate the
 //	 * worker threads so that the work queue can continue to be used.

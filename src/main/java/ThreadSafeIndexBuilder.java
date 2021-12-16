@@ -22,13 +22,15 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 	 * This QueryResult map holds lists of queryResults for each query line key.
 	 */
 	private final WorkQueue queue;
-	
+
+	// TODO private final ThreadSafeInvertedIndex index;
+
 	/**
 	 * Passes an invertedIndex into the class to be altered.
 	 *
 	 * @param invertedIndex invertedIndex to be entered
 	 */
-	public ThreadSafeIndexBuilder(InvertedIndex index, WorkQueue queue) {
+	public ThreadSafeIndexBuilder(InvertedIndex index, WorkQueue queue) { // TODO ThreadSafeInvertedIndex
 		super(index);
 		this.queue = queue;
 	}
@@ -36,9 +38,9 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 	@Override
 	public void readFile(Path path) throws IOException {
 		readFile(path, this.invertedIndex, this.queue);
+		// TODO queue.execute(new Task(path, invertedIndex));
 	}
-	
-	
+
 
 	@Override
 	public void build(Path mainPath) throws IOException {
@@ -51,8 +53,9 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 		}
 	}
 
+	// TODO Remove
 	/**
-	 * Reads the file path into the specified invertedIndex. 
+	 * Reads the file path into the specified invertedIndex.
 	 *
 	 * @param path file path to be read
 	 * @param invertedIndex the index that will append the stemmed words from the
@@ -62,11 +65,11 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 	public static void readFile(Path path, InvertedIndex invertedIndex, WorkQueue queue) throws IOException {
 		queue.execute(new Task(path, invertedIndex));
 	}
-	
-	public static class Task implements Runnable {
+
+	public static class Task implements Runnable { // TODO private class Task (no static keyword)
 		Path path;
 		InvertedIndex index;
-		
+
 		public Task(Path path, InvertedIndex index) {
 			this.path = path;
 			this.index = index;
@@ -77,7 +80,7 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 			InvertedIndex tempIndex = new InvertedIndex();
 			try{
 				InvertedIndexBuilder.readFile(path, tempIndex);
-				synchronized(index) {
+				synchronized(index) { // TODO Remove after the index is made thread-safe
 					index.addAll(tempIndex);
 				}
 			}

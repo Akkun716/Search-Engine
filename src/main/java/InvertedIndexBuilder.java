@@ -16,12 +16,12 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
  *
  * @author Adon Anglon
  */
-public class InvertedIndexBuilder {
+public class InvertedIndexBuilder { // TODO private
 	/**
 	 * This InvertedIndex will be a reference for the index passed into the function.
 	 */
 	protected final InvertedIndex invertedIndex;
-	
+
 	/** The log4j2 logger. */
 	protected static final Logger log = LogManager.getLogger();
 
@@ -76,7 +76,7 @@ public class InvertedIndexBuilder {
 	}
 
 	/**
-	 * Reads the file path into the specified invertedIndex. 
+	 * Reads the file path into the specified invertedIndex.
 	 *
 	 * @param path file path to be read
 	 * @param invertedIndex the index that will append the stemmed words from the
