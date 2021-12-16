@@ -42,13 +42,16 @@ public class Driver {
 		Path input, output;
 
 		if(map.hasFlag("-threads")) {
-			Integer threads = map.getInteger(null);
+			Integer threads = map.getInteger("-threads");
 			if(threads == null || threads <= 0) {
 				queue = new WorkQueue();
 			}
 			else {
 				queue = new WorkQueue(threads);
 			}
+
+			System.out.println(queue.size());
+
 			index = new ThreadSafeInvertedIndex();
 			indexBuilder = new ThreadSafeIndexBuilder(index, queue);
 			queryBuilder = new ThreadSafeQueryBuilder(index, queue);
