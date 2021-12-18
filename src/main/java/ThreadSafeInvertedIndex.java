@@ -12,7 +12,7 @@ import java.util.Set;
 public class ThreadSafeInvertedIndex extends InvertedIndex{
 
 	/** This will be the read/write lock needed for multithreading. */
-	IndexReadWriteLock lock;
+	IndexReadWriteLock lock; // TODO private final
 
 	/**
 	 * Initialization of index and initializes lock object.
@@ -20,11 +20,11 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	public ThreadSafeInvertedIndex() {
 		lock = new IndexReadWriteLock();
 	}
-	
+
 	@Override
 	public boolean add(String word, String location, Integer position) {
 		lock.writeLock().lock();
-		
+
 		try {
 			return super.add(word, location, position);
 		}
@@ -36,7 +36,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public List<QueryResult> exactSearch(Set<String> elem) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.exactSearch(elem);
 		}
@@ -48,7 +48,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public List<QueryResult> partialSearch(Set<String> elem) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.partialSearch(elem);
 		}
@@ -60,7 +60,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public Set<String> getWords() {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.getWords();
 		}
@@ -72,7 +72,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public Set<String> getLocations(String stem) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.getLocations(stem);
 		}
@@ -84,7 +84,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public Set<Integer> getPositions(String stem, String location) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.getPositions(stem, location);
 		}
@@ -96,7 +96,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public boolean hasStem(String stem) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.hasStem(stem);
 		}
@@ -108,7 +108,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public boolean hasLocation(String stem, String location) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.hasLocation(stem, location);
 		}
@@ -120,7 +120,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public boolean hasPosition(String stem, String location, Integer position) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.hasPosition(stem, location, position);
 		}
@@ -132,7 +132,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public int stemCount() {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.stemCount();
 		}
@@ -144,7 +144,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public int locationCount(String stem) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.locationCount(stem);
 		}
@@ -156,7 +156,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public int positionCount(String stem, String location) {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.positionCount(stem, location);
 		}
@@ -168,7 +168,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public String toString() {
 		lock.readLock().lock();
-		
+
 		try {
 			return super.toString();
 		}
@@ -180,7 +180,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public void indexToJson(Path output) throws IOException {
 		lock.readLock().lock();
-		
+
 		try {
 			super.indexToJson(output);
 		}
@@ -192,7 +192,7 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 	@Override
 	public void countToJson(Path output) throws IOException {
 		lock.readLock().lock();
-		
+
 		try {
 			super.countToJson(output);
 		}
@@ -200,4 +200,6 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 			lock.readLock().unlock();
 		}
 	}
+
+	// TODO Missing public void addAll(List<String> words, String location) and public void addAll(InvertedIndex index)
 }

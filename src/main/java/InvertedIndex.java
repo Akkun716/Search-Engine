@@ -18,13 +18,13 @@ public class InvertedIndex {
 	 * keys which are then paired to an array of positions in the file the word
 	 * stem appeared.
 	 */
-	protected final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
+	protected final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;  // TODO private
 
 	/**
 	 * This WordCount map holds the word count of the files included in the
 	 * invertedIndex map.
 	 */
-	public final Map<String, Integer> countMap;
+	public final Map<String, Integer> countMap; // TODO private
 
 	/**
 	 * Initializes invertedIndex and wordCount to new empty TreeMap objects.
@@ -69,10 +69,10 @@ public class InvertedIndex {
 		}
 		countMap.put(location, i);
 	}
-	
+
 	/**
 	 * Adds all elements from the inverted index passed into function.
-	 * 
+	 *
 	 * @param index inverted index to be read from
 	 */
 	public void addAll(InvertedIndex index) {
@@ -80,27 +80,50 @@ public class InvertedIndex {
 			addAllLocations(index, word);
 		}
 	}
-	
+
+	/* TODO
+	public void addAll2(InvertedIndex other) {
+		for(String word : other.invertedIndex.keySet()) {
+			TreeMap<String, TreeSet<Integer>> inner = other.invertedIndex.get(word);
+
+			if (this.invertedIndex.containsKey(word)) {
+				for (String location : inner.keySet()) {
+					TreeSet<Integer> positions = other.invertedIndex.get(word).get(location);
+
+					(have to check if safe to put the positions --or-- set.addAll)
+				}
+			}
+			else {
+				this.invertedIndex.put(word, inner);
+			}
+		}
+
+		for (String location : other.countMap.keySet()) {
+
+		}
+	}
+	*/
+
 	/**
 	 * Adds all of the integer positions of a stem at a location.
-	 * 
+	 *
 	 * @param index index to be read from
 	 * @param word stemmed word
 	 */
-	public void addAllLocations(InvertedIndex index, String word) {
+	public void addAllLocations(InvertedIndex index, String word) { // TODO Remove
 		for(String location : index.getLocations(word)) {
 			addAllPositions(index, word, location);
 		}
 	}
-	
+
 	/**
 	 * Adds all of the integer positions of a stem at a location.
-	 * 
+	 *
 	 * @param index index to be read from
 	 * @param word stemmed word
 	 * @param location file location where the word stem appeared
 	 */
-	public void addAllPositions(InvertedIndex index, String word, String location) {
+	public void addAllPositions(InvertedIndex index, String word, String location) { // TODO Remove
 		for(Integer position : index.getPositions(word, location)) {
 			add(word, location, position);
 		}
@@ -184,12 +207,12 @@ public class InvertedIndex {
 		Collections.sort(results);
 		return results;
 	}
-	
+
 	/**
 	 * Loops through the file locations where the stem key was found and either adds
 	 * a new queryResult to result list passed in function or updates the result
 	 * found in result list.
-	 * 
+	 *
 	 * @param stem stem key to reference
 	 * @param lookup lookup map for existing QueryResults in result list
 	 * @param results list containing query results from query search
@@ -197,7 +220,7 @@ public class InvertedIndex {
 	private void updateResult(String stem, Map<String, QueryResult> lookup,
 			List<QueryResult> results) {
 		QueryResult queryResult = null;
-		
+
 		for(String fileLocation: invertedIndex.get(stem).keySet()) {
 			queryResult = lookup.get(fileLocation);
 			if (queryResult == null) {

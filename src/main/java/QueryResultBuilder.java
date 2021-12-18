@@ -15,7 +15,7 @@ import org.apache.logging.log4j.Logger;
  * This class builds a list of queries from file reading as well as storing
  * query search results by an InvertedIndex (stored in a Map).
  */
-public class QueryResultBuilder {
+public class QueryResultBuilder { // TODO private final
 	/**
 	 * This QueryResult map holds lists of queryResults for each query line key.
 	 */
@@ -25,7 +25,7 @@ public class QueryResultBuilder {
 	 * This InvertedIndex will be a reference for the index passed into the function.
 	 */
 	protected final InvertedIndex index;
-	
+
 	/** The log4j2 logger. */
 	protected static final Logger log = LogManager.getLogger();
 
@@ -135,13 +135,13 @@ public class QueryResultBuilder {
 	 *
 	 * @param queryLine String of query search stems
 	 * @param queries set of queries to use for search
-	 * 
+	 *
 	 * @see #addResult(String, Set, boolean)
 	 */
 	private void addResult(String queryLine, Set<String> queries) {
 		addResult(queryLine, queries, false);
 	}
-	
+
 	/**
 	 * Adds a single query match result to queryResult.
 	 *
@@ -152,10 +152,10 @@ public class QueryResultBuilder {
 	protected void addResult(String queryLine, Set<String> queries, boolean exact) {
 		queryResult.put(queryLine, index.search(queries, exact));
 	}
-	
+
 	/**
 	 * Determines if queryResult map contains the passed key.
-	 * 
+	 *
 	 * @param queryKey key to search in queryResult
 	 * @return true if queryKey exists as key in queryResult
 	 */
