@@ -18,13 +18,13 @@ public class InvertedIndex {
 	 * keys which are then paired to an array of positions in the file the word
 	 * stem appeared.
 	 */
-	protected final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;  // TODO private
+	private final TreeMap<String, TreeMap<String, TreeSet<Integer>>> invertedIndex;
 
 	/**
 	 * This WordCount map holds the word count of the files included in the
 	 * invertedIndex map.
 	 */
-	public final Map<String, Integer> countMap; // TODO private
+	private final Map<String, Integer> countMap;
 
 	/**
 	 * Initializes invertedIndex and wordCount to new empty TreeMap objects.
@@ -75,57 +75,38 @@ public class InvertedIndex {
 	 *
 	 * @param index inverted index to be read from
 	 */
-	public void addAll(InvertedIndex index) {
-		for(String word : index.getWords()) {
-			addAllLocations(index, word);
-		}
-	}
+	public void addAll(InvertedIndex otherIndex) {
+		//For each word key in the other invertedIndex
+		for(String word : otherIndex.invertedIndex.keySet()) {
+			TreeMap<String, TreeSet<Integer>> locations = otherIndex.invertedIndex.get(word);
 
-	/* TODO
-	public void addAll2(InvertedIndex other) {
-		for(String word : other.invertedIndex.keySet()) {
-			TreeMap<String, TreeSet<Integer>> inner = other.invertedIndex.get(word);
-
-			if (this.invertedIndex.containsKey(word)) {
-				for (String location : inner.keySet()) {
-					TreeSet<Integer> positions = other.invertedIndex.get(word).get(location);
-
-					(have to check if safe to put the positions --or-- set.addAll)
+			//If the word key is in THIS invertedIndex
+			if(this.invertedIndex.containsKey(word)) {
+				//For each location in the other invertedIndex's word value
+				for(String location : locations.keySet()) {
+					TreeSet<Integer> positions = otherIndex.invertedIndex.get(word).get(location);
+					
+					//If the location key is in THIS invertedIndex's word value
+					if(this.invertedIndex.get(word).containsKey(location)) {
+						this.invertedIndex.get(word).get(location).addAll(positions);
+					}
+					//Else paste the whole entry
+					else {
+						this.invertedIndex.get(word).put(location, positions);
+					}
 				}
 			}
+			//Else paste the whole entry
 			else {
-				this.invertedIndex.put(word, inner);
+				this.invertedIndex.put(word, locations);
 			}
 		}
 
-		for (String location : other.countMap.keySet()) {
-
-		}
-	}
-	*/
-
-	/**
-	 * Adds all of the integer positions of a stem at a location.
-	 *
-	 * @param index index to be read from
-	 * @param word stemmed word
-	 */
-	public void addAllLocations(InvertedIndex index, String word) { // TODO Remove
-		for(String location : index.getLocations(word)) {
-			addAllPositions(index, word, location);
-		}
-	}
-
-	/**
-	 * Adds all of the integer positions of a stem at a location.
-	 *
-	 * @param index index to be read from
-	 * @param word stemmed word
-	 * @param location file location where the word stem appeared
-	 */
-	public void addAllPositions(InvertedIndex index, String word, String location) { // TODO Remove
-		for(Integer position : index.getPositions(word, location)) {
-			add(word, location, position);
+		for(String location : otherIndex.countMap.keySet()) {
+			Integer fileCount = otherIndex.countMap.get(location);
+			if(this.countMap.get(location) < fileCount) {
+				this.countMap.put(location, fileCount);
+			}
 		}
 	}
 
