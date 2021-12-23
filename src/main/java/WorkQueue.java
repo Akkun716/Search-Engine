@@ -88,21 +88,19 @@ public class WorkQueue {
 	 *
 	 * @throws InterruptedException from {@link Thread#wait()}
 	 */
-	protected synchronized void finish() throws InterruptedException { // TODO public
+	public synchronized void finish() {
 		log.debug("Waiting for work...");
 
-		while (pending > 0) {
-			this.wait();
-			log.debug("Woke up with pending at {}.", pending);
+		try {
+			while (pending > 0) {
+				this.wait();
+				log.debug("Woke up with pending at {}.", pending);
+			}
 		}
-
-		/*
-		 * TODO
-		 * try { while... }
-		 * catch (InterruptedException) { Thread.currentThread().interrupt(); }
-		 *
-		 */
-
+		catch (InterruptedException e) {
+			Thread.currentThread().interrupt();
+		}
+ 
 		log.debug("Work finished.");
 	}
 
@@ -125,19 +123,6 @@ public class WorkQueue {
 			this.notifyAll();
 		}
 	}
-
-	// TODO Cleanup
-//	/**
-//	 * Waits for all pending work (or tasks) to be finished. Does not terminate the
-//	 * worker threads so that the work queue can continue to be used.
-//	 */
-//	public synchronized void finish() {
-//		while(pending > 0) {
-//			synchronized(tasks) {
-//				tasks.notifyAll();
-//			}
-//		}
-//	}
 
 	/**
 	 * Asks the queue to shutdown. Any unprocessed work (or tasks) will not be
@@ -170,7 +155,7 @@ public class WorkQueue {
 			log.debug("All worker threads terminated.");
 		}
 		catch (InterruptedException e) {
-			System.err.println("Warning: Work queue interrupted while joining.");
+			log.error("Warning: Work queue interrupted while joining.");
 			log.catching(Level.DEBUG, e);
 			Thread.currentThread().interrupt();
 		}
@@ -242,7 +227,7 @@ public class WorkQueue {
 					}
 					catch (RuntimeException e) {
 						// catch runtime exceptions to avoid leaking threads
-						System.err.printf("Warning: Worker thread %s encountered an exception while running.%n", this.getName());
+						log.error("Warning: Worker thread %s encountered an exception while running.%n", this.getName());
 						log.catching(Level.DEBUG, e);
 					}
 					finally {
@@ -251,7 +236,7 @@ public class WorkQueue {
 				}
 			}
 			catch (InterruptedException e) {
-				System.err.printf("Warning: Worker thread %s interrupted while waiting.%n", this.getName());
+				log.error("Warning: Worker thread %s interrupted while waiting.%n", this.getName());
 				log.catching(Level.DEBUG, e);
 				Thread.currentThread().interrupt();
 			}
