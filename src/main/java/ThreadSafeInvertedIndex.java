@@ -12,7 +12,7 @@ import java.util.Set;
 public class ThreadSafeInvertedIndex extends InvertedIndex{
 
 	/** This will be the read/write lock needed for multithreading. */
-	IndexReadWriteLock lock; // TODO private final
+	private final IndexReadWriteLock lock;
 
 	/**
 	 * Initialization of index and initializes lock object.
@@ -27,6 +27,30 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 
 		try {
 			return super.add(word, location, position);
+		}
+		finally {
+			lock.writeLock().unlock();
+		}
+	}
+	
+	@Override
+	public void addAll(List<String> words, String location) {
+		lock.writeLock().lock();
+		
+		try {
+			super.addAll(words, location);
+		}
+		finally {
+			lock.writeLock().unlock();
+		}
+	}
+	
+	@Override
+	public void addAll(InvertedIndex index) {
+		lock.writeLock().lock();
+		
+		try {
+			super.addAll(index);
 		}
 		finally {
 			lock.writeLock().unlock();
@@ -200,6 +224,4 @@ public class ThreadSafeInvertedIndex extends InvertedIndex{
 			lock.readLock().unlock();
 		}
 	}
-
-	// TODO Missing public void addAll(List<String> words, String location) and public void addAll(InvertedIndex index)
 }
