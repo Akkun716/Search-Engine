@@ -13,14 +13,21 @@ import java.util.TreeMap;
  * This class builds a list of queries from file reading as well as storing
  * query search results by an InvertedIndex (stored in a Map).
  */
-public class ThreadSafeQueryBuilder extends QueryResultBuilder{
+public class ThreadSafeQueryBuilder implements QueryBuilder {
+	/**
+	 * This QueryResult map holds lists of queryResults for each query line key.
+	 */
+	private final Map<String, List<InvertedIndex.QueryResult>> queryResult = new TreeMap<>();
+	
+	/**
+	 * This InvertedIndex will be a reference for the index passed into the function.
+	 */
+	private final ThreadSafeInvertedIndex index;
+	
 	/**
 	 * This QueryResult map holds lists of queryResults for each query line key.
 	 */
 	private final WorkQueue queue;
-
-	/** This will be the read/write lock needed for multithreading. */
-//	IndexReadWriteLock lock;
 
 	/**
 	 * Initializes the queryResult and queryList instance members to a new
@@ -28,37 +35,51 @@ public class ThreadSafeQueryBuilder extends QueryResultBuilder{
 	 *
 	 * @param index invertedIndex to be referenced
 	 */
-	public ThreadSafeQueryBuilder(InvertedIndex index, WorkQueue queue) { // TODO ThreadSafeInvertedIndex
-		super(index);
+	public ThreadSafeQueryBuilder(ThreadSafeInvertedIndex index, WorkQueue queue) {
+		this.index = index;
 		this.queue = queue;
-//		this.lock = new IndexReadWriteLock();
 	}
 
-	@Override
 	public void readQueryLine(String line, boolean exact) {
 		queue.execute(new Task(line, exact));
 	}
 
-	@Override
 	public void build(Path mainPath, boolean exact) throws IOException {
-		super.build(mainPath, exact);
-		try {
-			queue.finish();
+		if(Files.isDirectory(mainPath)) {
+			readQueryFiles(mainPath, exact);
 		}
-		catch(InterruptedException e) {
-			log.debug("An Interruption error was thrown and needs to be handled.");
+		else {
+			readQueryFile(mainPath, exact);
 		}
+		
+		queue.finish();
 	}
 
-	@Override
-	protected void addResult(String queryLine, Set<String> queries, boolean exact) {
+	private void addResult(String queryLine, Set<String> queries, boolean exact) {
 		List<InvertedIndex.QueryResult> tempList = index.search(queries, exact);
 		synchronized(queryResult) {
 			queryResult.put(queryLine, tempList);
 		}
 	}
-
-	// TODO Need to make containsResult thread-safe
+	
+	public boolean containsResult(String queryKey) {
+		synchronized(queryResult) {
+			return queryResult.containsKey(queryKey);
+		}
+	}
+	
+	/**
+	 * Utilizes the JsonWriter class and writes out queryResult in JSON format out
+	 * to output file.
+	 *
+	 * @param output path to the output file
+	 * @throws IOException file is invalid or can not be found
+	 */
+	public void resultToJson(Path output) throws IOException {
+		synchronized(queryResult) {
+			JsonWriter.asResult(queryResult, output);
+		}
+	}
 
 	public class Task implements Runnable {
 		String fileLine;
@@ -71,7 +92,7 @@ public class ThreadSafeQueryBuilder extends QueryResultBuilder{
 
 		@Override
 		public void run() {
-			synchronized(ThreadSafeQueryBuilder.class) { // TODO Could address this by using an interface instead
+			synchronized(queryResult) {
 				var queries = TextStemmer.uniqueStems(fileLine);
 				var joined = String.join(" ", queries);
 
