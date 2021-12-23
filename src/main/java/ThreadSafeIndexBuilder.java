@@ -17,62 +17,50 @@ import opennlp.tools.stemmer.snowball.SnowballStemmer;
  *
  * @author Adon Anglon
  */
-public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
+public class ThreadSafeIndexBuilder implements IndexBuilder {
+	/**
+	 * This InvertedIndex will be a reference for the index passed into the function.
+	 */
+	private final ThreadSafeInvertedIndex invertedIndex;
+	
 	/**
 	 * This QueryResult map holds lists of queryResults for each query line key.
 	 */
 	private final WorkQueue queue;
-
-	// TODO private final ThreadSafeInvertedIndex index;
 
 	/**
 	 * Passes an invertedIndex into the class to be altered.
 	 *
 	 * @param invertedIndex invertedIndex to be entered
 	 */
-	public ThreadSafeIndexBuilder(InvertedIndex index, WorkQueue queue) { // TODO ThreadSafeInvertedIndex
-		super(index);
+	public ThreadSafeIndexBuilder(ThreadSafeInvertedIndex index, WorkQueue queue) {
+		this.invertedIndex = index;
 		this.queue = queue;
 	}
 
-	@Override
 	public void readFile(Path path) throws IOException {
-		readFile(path, this.invertedIndex, this.queue);
-		// TODO queue.execute(new Task(path, invertedIndex));
+		queue.execute(new Task(path));
 	}
 
-
-	@Override
 	public void build(Path mainPath) throws IOException {
-		super.build(mainPath);
-		try {
-			queue.finish();
+		if(Files.isDirectory(mainPath)) {
+			readFiles(mainPath);
 		}
-		catch(InterruptedException e) {
-			log.debug("An Interruption error was thrown and needs to be handled.");
+		else {
+			readFile(mainPath);
 		}
+		queue.finish();
 	}
 
-	// TODO Remove
 	/**
-	 * Reads the file path into the specified invertedIndex.
-	 *
-	 * @param path file path to be read
-	 * @param invertedIndex the index that will append the stemmed words from the
-	 * 	file
-	 * @throws IOException file is invalid or can not be found
+	 * This inner class represents a Runnable task that can be added to a work
+	 * queue for multithreading.
 	 */
-	public static void readFile(Path path, InvertedIndex invertedIndex, WorkQueue queue) throws IOException {
-		queue.execute(new Task(path, invertedIndex));
-	}
-
-	public static class Task implements Runnable { // TODO private class Task (no static keyword)
+	private class Task implements Runnable {
 		Path path;
-		InvertedIndex index;
 
-		public Task(Path path, InvertedIndex index) {
+		public Task(Path path) {
 			this.path = path;
-			this.index = index;
 		}
 
 		@Override
@@ -80,9 +68,7 @@ public class ThreadSafeIndexBuilder extends InvertedIndexBuilder {
 			InvertedIndex tempIndex = new InvertedIndex();
 			try{
 				InvertedIndexBuilder.readFile(path, tempIndex);
-				synchronized(index) { // TODO Remove after the index is made thread-safe
-					index.addAll(tempIndex);
-				}
+				invertedIndex.addAll(tempIndex);
 			}
 			catch(IOException e) {
 					log.debug("An IO error was thrown and needs to be handled.");
