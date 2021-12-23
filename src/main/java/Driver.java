@@ -2,18 +2,6 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
 
-// TODO Final code review
-
-/*
- * TODO Focus first on passing 3a with these changes...
- * Maybe even create another v3.0.x release to make sure it passes on Github.
- *
- * Reach out on Piazza with 1 question at a time:
- * 1. Did you make the data structure thread safe properly?
- * 2. Ask how to make build faster.
- * 3. Ask how to make search faster.
- */
-
 /**
  * Class responsible for running this project based on the provided command-line
  * arguments. See the README for details.
@@ -36,8 +24,8 @@ public class Driver {
 
 		ArgumentMap map = new ArgumentMap(args);
 		InvertedIndex index;
-		InvertedIndexBuilder indexBuilder;
-		QueryResultBuilder queryBuilder;
+		IndexBuilder indexBuilder;
+		QueryBuilder queryBuilder;
 		WorkQueue queue = null;
 		Path input, output;
 
@@ -52,9 +40,10 @@ public class Driver {
 
 			System.out.println(queue.size());
 
-			index = new ThreadSafeInvertedIndex();
-			indexBuilder = new ThreadSafeIndexBuilder(index, queue);
-			queryBuilder = new ThreadSafeQueryBuilder(index, queue);
+			ThreadSafeInvertedIndex safeIndex = new ThreadSafeInvertedIndex();
+			index = safeIndex;
+			indexBuilder = new ThreadSafeIndexBuilder(safeIndex, queue);
+			queryBuilder = new ThreadSafeQueryBuilder(safeIndex, queue);
 		}
 		else {
 			index = new InvertedIndex();
