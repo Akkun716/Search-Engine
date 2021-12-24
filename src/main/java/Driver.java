@@ -1,3 +1,4 @@
+import java.net.URL;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -29,6 +30,8 @@ public class Driver {
 		WorkQueue queue = null;
 		Path input, output;
 
+		
+		
 		if(map.hasFlag("-threads")) {
 			Integer threads = map.getInteger("-threads");
 			if(threads == null || threads <= 0) {
@@ -51,6 +54,22 @@ public class Driver {
 			queryBuilder = new QueryResultBuilder(index);
 		}
 
+		if(map.hasFlag("-html")) {
+			String url = map.getString("-html");
+			try {
+				indexBuilder = new WebCrawlerBuilder(index, queue);
+//				indexBuilder.build(url);
+			}
+			catch(Exception e) {
+				if(url == null) {
+					System.out.println("Unable to build the inverted index from unreadable url");
+				}
+				else {
+					System.out.println("Unable to build the inverted index from url: " + url.toString());
+				}
+			}
+		}
+		
 		if(map.hasFlag("-text")) {
 			input = map.getPath("-text");
 			try {
