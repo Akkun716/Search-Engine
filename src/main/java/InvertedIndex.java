@@ -102,9 +102,11 @@ public class InvertedIndex {
 			}
 		}
 
+		//Update the word count for each file location
 		for(String location : otherIndex.countMap.keySet()) {
 			Integer fileCount = otherIndex.countMap.get(location);
-			if(this.countMap.get(location) < fileCount) {
+			if(this.countMap.get(location) == null ||
+					this.countMap.get(location) < fileCount) {
 				this.countMap.put(location, fileCount);
 			}
 		}
