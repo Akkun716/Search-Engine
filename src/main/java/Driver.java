@@ -1,3 +1,4 @@
+import java.net.URL;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.time.Instant;
@@ -29,6 +30,8 @@ public class Driver {
 		WorkQueue queue = null;
 		Path input, output;
 
+		
+		
 		if(map.hasFlag("-threads")) {
 			Integer threads = map.getInteger("-threads");
 			if(threads == null || threads <= 0) {
@@ -50,7 +53,7 @@ public class Driver {
 			indexBuilder = new InvertedIndexBuilder(index);
 			queryBuilder = new QueryResultBuilder(index);
 		}
-
+		
 		if(map.hasFlag("-text")) {
 			input = map.getPath("-text");
 			try {
