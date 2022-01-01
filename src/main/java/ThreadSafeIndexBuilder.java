@@ -37,10 +37,12 @@ public class ThreadSafeIndexBuilder implements IndexBuilder {
 		this.queue = queue;
 	}
 
+	@Override
 	public void readFile(Path path) throws IOException {
 		queue.execute(new Task(path));
 	}
 
+	@Override
 	public void build(Path mainPath) throws IOException {
 		if(Files.isDirectory(mainPath)) {
 			readFiles(mainPath);
