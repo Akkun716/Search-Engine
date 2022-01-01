@@ -1,4 +1,6 @@
 import org.apache.commons.text.StringEscapeUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 /**
  * Cleans simple, validating HTML 4/5 into plain text.
@@ -7,6 +9,9 @@ import org.apache.commons.text.StringEscapeUtils;
  * @version Fall 2021
  */
 public class HtmlCleaner {
+	/** The log4j2 logger. */
+	static final Logger log = LogManager.getLogger();
+	
 	/**
 	 * Replaces all HTML 4 entities with their Unicode character equivalent or, if
 	 * unrecognized, replaces the entity code with an empty string. For example:,
@@ -42,9 +47,7 @@ public class HtmlCleaner {
 	 * @see String#replaceAll(String, String)
 	 */
 	public static String stripTags(String html) {
-//		return html.replaceAll("<[a-z|\\s|=|\"|/]*?>", "");
 		return html.replaceAll("<[\\w\\s=\"\\.$&+,:;=?@#|'<>^*()%!-_]*?>", "");
-//		return html.replaceAll("<(.|\\s)*?>", "");
 	}
 
 	/**
@@ -98,7 +101,6 @@ public class HtmlCleaner {
 	public static String stripElement(String html, String name) {
 		StringBuilder builder = new StringBuilder("<");
 		name = regexInsensitive(name);
-//		String regex = "<" + name + "(>|\\s)(.|\\s)*?" + name + ">";
 		builder.append(name);
 		builder.append("(>|\\s)(.|\\s|>)*?/");
 		builder.append(name);
@@ -113,7 +115,7 @@ public class HtmlCleaner {
 	 * @return the case insensitive regex pattern
 	 */
 	private static String regexInsensitive(String name) {
-		System.out.println("\tStarting building regex...");
+		log.debug("\tStarting building regex...");
 		StringBuilder builder = new StringBuilder();
 		String nameUpper = name.toUpperCase();
 		String nameLower = name.toLowerCase();
@@ -124,7 +126,7 @@ public class HtmlCleaner {
 			builder.append(nameUpper.charAt(i));
 			builder.append("]");
 		}
-		System.out.println("\tDone constructing insensitive regex!");
+		log.debug("\tDone constructing insensitive regex!");
 		return builder.toString();
 	}
 
@@ -137,19 +139,19 @@ public class HtmlCleaner {
 	 */
 	public static String stripBlockElements(String html) {
 		html = stripComments(html);
-		System.out.println("\tDone striping comments!");
+		log.debug("\tDone striping comments!");
 		html = stripElement(html, "head");
-		System.out.println("\tDone striping head!");
+		log.debug("\tDone striping head!");
 		html = stripElement(html, "style");
-		System.out.println("\tDone striping style!");
+		log.debug("\tDone striping style!");
 		html = stripElement(html, "script");
-		System.out.println("\tDone striping script!");
+		log.debug("\tDone striping script!");
 		html = stripElement(html, "noscript");
-		System.out.println("\tDone striping noscript!");
+		log.debug("\tDone striping noscript!");
 		html = stripElement(html, "iframe");
-		System.out.println("\tDone striping iframe!");
+		log.debug("\tDone striping iframe!");
 		html = stripElement(html, "svg");
-		System.out.println("\tDone striping svg!");
+		log.debug("\tDone striping svg!");
 		return html;
 	}
 
@@ -163,21 +165,21 @@ public class HtmlCleaner {
 	 * @return text clean of any HTML tags and certain block elements
 	 */
 	public static String stripHtml(String html) {
-		System.out.println("\nSTART CLEAN...");
+		log.debug("\nSTART CLEAN...");
 		
-		System.out.println("Starting striping blocks...");
+		log.debug("Starting striping blocks...");
 		html = stripBlockElements(html);
-		System.out.println("Finished striping blocks!");
+		log.debug("Finished striping blocks!");
 		
-		System.out.println("Starting striping tags...");
+		log.debug("Starting striping tags...");
 		html = stripTags(html);
-		System.out.println("Finished striping tags!");
+		log.debug("Finished striping tags!");
 		
-		System.out.println("Starting striping entities...");
+		log.debug("Starting striping entities...");
 		html = stripEntities(html);
-		System.out.println("Finished striping entities!");
+		log.debug("Finished striping entities!");
 		
-		System.out.println("DONE!");
+		log.debug("DONE!");
 		return html;
 	}
 }
