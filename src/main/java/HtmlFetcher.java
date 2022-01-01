@@ -106,8 +106,6 @@ public class HtmlFetcher {
 					html = fetch(headers.get("Location").get(0), redirects - 1);
 				}
 			}
-			// TODO Don't use HttpsFetcher.fetch(...) here, but the other methods will be handy!
-//			throw new UnsupportedOperationException("Not yet implemented (" + request.hashCode() + ", " + response.hashCode() + ").");
 		}
 		catch (IOException e) {
 			html = null;
