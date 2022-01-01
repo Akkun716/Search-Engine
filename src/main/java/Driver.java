@@ -24,16 +24,17 @@ public class Driver {
 		Instant start = Instant.now();
 
 		ArgumentMap map = new ArgumentMap(args);
-		InvertedIndex index;
-		IndexBuilder indexBuilder;
-		QueryBuilder queryBuilder;
+		InvertedIndex index = null;
+		ThreadSafeInvertedIndex safeIndex = null;
+		IndexBuilder indexBuilder = null;
+		QueryBuilder queryBuilder = null;
 		WorkQueue queue = null;
 		Path input, output;
 
 		
-		
 		if(map.hasFlag("-threads")) {
 			Integer threads = map.getInteger("-threads");
+			//Queue initialized with default 5 threads if invalid map value
 			if(threads == null || threads <= 0) {
 				queue = new WorkQueue();
 			}
@@ -41,33 +42,34 @@ public class Driver {
 				queue = new WorkQueue(threads);
 			}
 
-			System.out.println(queue.size());
-
-			ThreadSafeInvertedIndex safeIndex = new ThreadSafeInvertedIndex();
+			safeIndex = new ThreadSafeInvertedIndex();
 			index = safeIndex;
-			indexBuilder = new ThreadSafeIndexBuilder(safeIndex, queue);
+			
+			if(map.hasFlag("-html")) {
+				String url = map.getString("-html");
+				try {
+					WebCrawlerBuilder webBuilder = new WebCrawlerBuilder(safeIndex, queue);
+					webBuilder.build(url);
+				}
+				catch(Exception e) {
+					if(url == null) {
+						System.out.println("Unable to build the inverted index from unreadable url");
+					}
+					else {
+						System.out.println("Unable to build the inverted index from url: " + url.toString());
+					}
+				}
+			}
+			else {
+				indexBuilder = new ThreadSafeIndexBuilder(safeIndex, queue);
+			}
 			queryBuilder = new ThreadSafeQueryBuilder(safeIndex, queue);
 		}
+		//Single-thread index and builder initializations
 		else {
 			index = new InvertedIndex();
 			indexBuilder = new InvertedIndexBuilder(index);
 			queryBuilder = new QueryResultBuilder(index);
-		}
-
-		if(map.hasFlag("-html")) {
-			String url = map.getString("-html");
-			try {
-				indexBuilder = new WebCrawlerBuilder(index, queue);
-//				indexBuilder.build(url);
-			}
-			catch(Exception e) {
-				if(url == null) {
-					System.out.println("Unable to build the inverted index from unreadable url");
-				}
-				else {
-					System.out.println("Unable to build the inverted index from url: " + url.toString());
-				}
-			}
 		}
 		
 		if(map.hasFlag("-text")) {
