@@ -63,11 +63,13 @@ public class InvertedIndex {
 	 * @param location file location where the word stem appeared
 	 */
 	public void addAll(List<String> words, String location) {
-		int i = 1;
+		int i = 0;
 		for(String word: words) {
-			add(word, location, i++);
+			add(word, location, ++i);
 		}
-		countMap.put(location, i);
+		if(i != 0) {
+			countMap.put(location, i);
+		}
 	}
 
 	/**
