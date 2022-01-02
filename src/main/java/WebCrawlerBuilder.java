@@ -42,35 +42,35 @@ public class WebCrawlerBuilder {
 	}
 	
 	public void build(String url, int maxCrawl) throws IOException {
-		log.debug("Beginning build...");
+		System.out.println("Beginning build...");
 		this.maxCrawl = maxCrawl;
 		crawl(url);
 		queue.finish();
 	}
 	
 	public void crawl(String url) throws IOException {
-		log.debug("Retrieving link...");
+		System.out.println("Retrieving link...");
 		String html = HtmlFetcher.fetch(url, 3);
-		log.debug("Retrieved!");
+		System.out.println("Retrieved!");
 		html = HtmlCleaner.stripBlockElements(html);
-		log.debug("Stripped block elements!");
+		System.out.println("Stripped block elements!");
 		List<URL> validLinks = LinkParser.getValidLinks(new URL(url), html);
-		log.debug("Found Valid Links!");
-		log.debug("Executing validLink loop...");
-		while(validLinks.size() > 0 && maxCrawl > 0) {
-			synchronized(lock) {
+		System.out.println("Found Valid Links!");
+		System.out.println("Executing validLink loop...");
+		synchronized(maxCrawl) {
+			while(validLinks.size() > 0 && maxCrawl > 0) {
 				maxCrawl--;
-				log.debug("NEW LINK FOUND! Executing new crawl...");
+				System.out.println("NEW LINK FOUND! Executing new crawl...");
 				crawlURL(validLinks.remove(0));
 			}
 		}
-		log.debug("Finished loop!");
-		log.debug("Stripping rest of HTML...");
+		System.out.println("Finished loop!");
+		System.out.println("Stripping rest of HTML...");
 		html = HtmlCleaner.stripHtml(html);
-		log.debug("Stripped all HTML!");
-		log.debug("Beginning page parsing...");
+		System.out.println("Stripped all HTML!");
+		System.out.println("Beginning page parsing...");
 		readPage(html, url);
-		log.debug("Done parsing...");
+		System.out.println("Done parsing...");
 	}
 	
 	public void readPage(String html, String url) {
@@ -98,7 +98,7 @@ public class WebCrawlerBuilder {
 				crawl(url.toString());
 			}
 			catch(IOException e) {
-					log.debug("An IO error was thrown and needs to be handled.");
+					System.out.println("An IO error was thrown and needs to be handled.");
 			}
 		}
 	}
@@ -121,7 +121,7 @@ public class WebCrawlerBuilder {
 			InvertedIndex tempIndex = new InvertedIndex();
 			tempIndex.addAll(TextFileStemmer.listStems(html), url);
 			invertedIndex.addAll(tempIndex);
-			log.debug("Finished copying index from " + url);
+			System.out.println("Finished copying index from " + url);
 			
 		}
 	}
