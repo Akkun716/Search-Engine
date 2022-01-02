@@ -47,9 +47,11 @@ public class Driver {
 			
 			if(map.hasFlag("-html")) {
 				String url = map.getString("-html");
+				int maxCrawl = map.getInteger("-max", 1);
+				
 				try {
 					WebCrawlerBuilder webBuilder = new WebCrawlerBuilder(safeIndex, queue);
-					webBuilder.build(url);
+					webBuilder.build(url, maxCrawl);
 				}
 				catch(Exception e) {
 					if(url == null) {
